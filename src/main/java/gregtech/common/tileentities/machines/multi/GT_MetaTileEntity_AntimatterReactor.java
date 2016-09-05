@@ -50,7 +50,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     public String[] getDescription() {
         return new String[]{
                 "Controller Block for the Antimatter Reactor",
-                "Size(WxHxD): 7x7x7 (Sphere), Controller (on centered block in 2 layer)",
+                "Size(WxHxD): 7x7x7 (Sphere)",
                 "Blah-Blah-Blah",
                 "Blah-Blah-Blah",
                 "Blah-Blah-Blah",
@@ -94,7 +94,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     //CHANGE!!! Check Recipes. Compare this two
      @Override
     public boolean checkRecipe(ItemStack aStack) {
-        ArrayList<FluidStack> tFluidList = getStoredFluids();
+        /*ArrayList<FluidStack> tFluidList = getStoredFluids();
         for (int i = 0; i < tFluidList.size() - 1; i++) {
             for (int j = i + 1; j < tFluidList.size(); j++) {
                 if (GT_Utility.areFluidsEqual((FluidStack) tFluidList.get(i), (FluidStack) tFluidList.get(j))) {
@@ -125,7 +125,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
                 mRunningOnLoad = false;
                 return true;
             }
-        }
+        }*/
         return false;
     }
     
@@ -148,21 +148,21 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     @Override
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
     	
-    	int xCenter = getBaseMetaTileEntity().getXCoord() + ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetX * 7;
+        xDir = ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetX;
+        zDir = ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetZ;
+    	
+    	int xCenter = getBaseMetaTileEntity().getXCoord() + xDir * 7;
         int yCenter = getBaseMetaTileEntity().getYCoord();
-        int zCenter = getBaseMetaTileEntity().getZCoord() + ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetZ * 7;
-        
-        xDir = Math.abs(ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetX);
-        zDir = Math.abs(ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetZ);
+        int zCenter = getBaseMetaTileEntity().getZCoord() + zDir * 7;
                 
         if ((checkRingInYPlane(xCenter, yCenter, zCenter)) && (checkRingInVPlane(xCenter, yCenter, zCenter)) //Check rings (Dyson Sphere)
-        		&& (checkCoreCoil(xCenter, yCenter, zCenter)) && (checkCoreCasings(xCenter, yCenter + 1, zCenter)) && (isCore(xCenter, yCenter, zCenter)) //Check Core components
-                && (addIfEnergyExtractor(xCenter + 6, yCenter, zCenter, aBaseMetaTileEntity)) && (addIfEnergyExtractor(xCenter - 6, yCenter, zCenter, aBaseMetaTileEntity))
-                && (addIfEnergyExtractor(xCenter, yCenter, zCenter + 6, aBaseMetaTileEntity)) && (addIfEnergyExtractor(xCenter, yCenter, zCenter - 6, aBaseMetaTileEntity))
-                && (addIfFluidInjector(xCenter + 2, yCenter, zCenter, aBaseMetaTileEntity)) && (addIfFluidInjector(xCenter - 2, yCenter, zCenter, aBaseMetaTileEntity))
-                && (addIfFluidInjector(xCenter, yCenter, zCenter + 2, aBaseMetaTileEntity)) && (addIfFluidInjector(xCenter, yCenter, zCenter - 2, aBaseMetaTileEntity))
-                && (this.mDynamoHatches.size() >= 1) && (this.mInputHatches.size() >= 2)) {
-            if (this.mDynamoHatches != null) {
+        		&& (checkKineticCoils(xCenter, yCenter, zCenter))//Check Kinetic Ring
+        		&& (checkMagneticCoilsInXPlane(xCenter, yCenter, zCenter)) && (checkMagneticCoilsInYPlane(xCenter, yCenter, zCenter)) // Check Magnetic Ring
+        		&& (checkCoreCasings(xCenter, yCenter, zCenter)) && (checkLoadingChamber(xCenter, yCenter, zCenter)) //Check Core Components
+        		&& (checkIntermixChamber(xCenter, yCenter, zCenter)) // Check Intermix Chamber
+        		&& (addIfEnergyExtractor(xCenter + xDir * 7, yCenter, zCenter + zDir * 7 , aBaseMetaTileEntity))
+        		/*&& (this.mDynamoHatches.size() >= 1) && (this.mInputHatches.size() >= 2)*/) {
+           /* if (this.mDynamoHatches != null) {
                 for (int i = 0; i < this.mDynamoHatches.size(); i++) {
                     if (this.mDynamoHatches.get(i).mTier < 9)
                         return false;
@@ -173,7 +173,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
                     if (this.mInputHatches.get(i).mTier < 9)
                         return false;
                 }
-            }
+            }*/
             mWrench = true;
             mScrewdriver = true;
             mSoftHammer = true;
@@ -206,19 +206,30 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     
     //Check vertical casing rings (Dyson Sphere)
     private boolean checkRingInVPlane(int aX, int aY, int aZ) {
-        return (isAdvancedMachineCasing(aX + 7, aY - 1, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 1, aZ)) && (isAdvancedMachineCasing(aX + 7, aY - 2, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 2, aZ))
+        return (isAdvancedMachineCasing(aX, aY - 7, aZ)) && (isAdvancedMachineCasing(aX, aY + 7, aZ))
+        		&& (((isAdvancedMachineCasing(aX + 7, aY - 1, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 1, aZ)) && (isAdvancedMachineCasing(aX + 7, aY - 2, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 2, aZ))
         		&& (isAdvancedMachineCasing(aX + 7, aY - 3, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 3, aZ)) && (isAdvancedMachineCasing(aX + 6, aY - 4, aZ)) && (isAdvancedMachineCasing(aX + 6, aY + 4, aZ))
-        		&& (isAdvancedMachineCasing(aX + 5, aY - 5, aZ)) && (isAdvancedMachineCasing(aX + 5, aY + 5, aZ)) && (isAdvancedMachineCasing(aX + 4, aY - 5, aZ)) && (isAdvancedMachineCasing(aX + 4, aY + 5, aZ))
+        		&& (isAdvancedMachineCasing(aX + 5, aY - 5, aZ)) && (isAdvancedMachineCasing(aX + 5, aY + 5, aZ)) && (isAdvancedMachineCasing(aX + 4, aY - 6, aZ)) && (isAdvancedMachineCasing(aX + 4, aY + 6, aZ))
         		&& (isAdvancedMachineCasing(aX + 3, aY - 7, aZ)) && (isAdvancedMachineCasing(aX + 3, aY + 7, aZ)) && (isAdvancedMachineCasing(aX + 2, aY - 7, aZ)) && (isAdvancedMachineCasing(aX + 2, aY + 7, aZ))
-        		&& (isAdvancedMachineCasing(aX + 1, aY - 7, aZ)) && (isAdvancedMachineCasing(aX + 1, aY + 7, aZ)) && (isAdvancedMachineCasing(aX, aY - 7, aZ)) && (isAdvancedMachineCasing(aX, aY + 7, aZ))
+        		&& (isAdvancedMachineCasing(aX + 1, aY - 7, aZ)) && (isAdvancedMachineCasing(aX + 1, aY + 7, aZ))
         		&& (isAdvancedMachineCasing(aX - 1, aY - 7, aZ)) && (isAdvancedMachineCasing(aX - 1, aY + 7, aZ)) && (isAdvancedMachineCasing(aX - 2, aY - 7, aZ)) && (isAdvancedMachineCasing(aX - 2, aY + 7, aZ))
         		&& (isAdvancedMachineCasing(aX - 3, aY - 7, aZ)) && (isAdvancedMachineCasing(aX - 3, aY + 7, aZ)) && (isAdvancedMachineCasing(aX - 4, aY - 6, aZ)) && (isAdvancedMachineCasing(aX - 4, aY + 6, aZ))
         		&& (isAdvancedMachineCasing(aX - 5, aY - 5, aZ)) && (isAdvancedMachineCasing(aX - 5, aY + 5, aZ)) && (isAdvancedMachineCasing(aX - 6, aY - 4, aZ)) && (isAdvancedMachineCasing(aX - 6, aY + 4, aZ))
         		&& (isAdvancedMachineCasing(aX - 7, aY - 3, aZ)) && (isAdvancedMachineCasing(aX - 7, aY + 3, aZ)) && (isAdvancedMachineCasing(aX - 7, aY - 2, aZ)) && (isAdvancedMachineCasing(aX - 7, aY + 2, aZ))
-        		&& (isAdvancedMachineCasing(aX - 7, aY - 1, aZ)) && (isAdvancedMachineCasing(aX - 7, aY + 1, aZ));
+        		&& (isAdvancedMachineCasing(aX - 7, aY - 1, aZ)) && (isAdvancedMachineCasing(aX - 7, aY + 1, aZ)))
+        		|| ((isAdvancedMachineCasing(aX, aY - 1, aZ + 7)) && (isAdvancedMachineCasing(aX, aY + 1, aZ + 7)) && (isAdvancedMachineCasing(aX, aY - 2, aZ + 7)) && (isAdvancedMachineCasing(aX, aY + 2, aZ + 7))
+                && (isAdvancedMachineCasing(aX, aY - 3, aZ + 7)) && (isAdvancedMachineCasing(aX, aY + 3, aZ + 7)) && (isAdvancedMachineCasing(aX, aY - 4, aZ + 6)) && (isAdvancedMachineCasing(aX, aY + 4, aZ + 6))
+                && (isAdvancedMachineCasing(aX, aY - 5, aZ + 5)) && (isAdvancedMachineCasing(aX, aY + 5, aZ + 5)) && (isAdvancedMachineCasing(aX, aY - 6, aZ + 4)) && (isAdvancedMachineCasing(aX, aY + 6, aZ + 4))
+                && (isAdvancedMachineCasing(aX, aY - 7, aZ + 3)) && (isAdvancedMachineCasing(aX, aY + 7, aZ + 3)) && (isAdvancedMachineCasing(aX, aY - 7, aZ + 2)) && (isAdvancedMachineCasing(aX, aY + 7, aZ + 2))
+                && (isAdvancedMachineCasing(aX, aY - 7, aZ + 1)) && (isAdvancedMachineCasing(aX, aY + 7, aZ + 1))
+                && (isAdvancedMachineCasing(aX, aY - 7, aZ - 1)) && (isAdvancedMachineCasing(aX, aY + 7, aZ - 1)) && (isAdvancedMachineCasing(aX, aY - 7, aZ - 2)) && (isAdvancedMachineCasing(aX, aY + 7, aZ - 2))
+                && (isAdvancedMachineCasing(aX, aY - 7, aZ - 3)) && (isAdvancedMachineCasing(aX, aY + 7, aZ - 3)) && (isAdvancedMachineCasing(aX, aY - 6, aZ - 4)) && (isAdvancedMachineCasing(aX, aY + 6, aZ - 4))
+                && (isAdvancedMachineCasing(aX, aY - 5, aZ - 5)) && (isAdvancedMachineCasing(aX, aY + 5, aZ - 5)) && (isAdvancedMachineCasing(aX, aY - 4, aZ - 6)) && (isAdvancedMachineCasing(aX, aY + 4, aZ - 6))
+                && (isAdvancedMachineCasing(aX, aY - 3, aZ - 7)) && (isAdvancedMachineCasing(aX, aY + 3, aZ - 7)) && (isAdvancedMachineCasing(aX, aY - 2, aZ - 7)) && (isAdvancedMachineCasing(aX, aY + 2, aZ - 7))
+                && (isAdvancedMachineCasing(aX, aY - 1, aZ - 7)) && (isAdvancedMachineCasing(aX, aY + 1, aZ - 7))));
     }
     
-  //Check kinetic coils
+    //Check kinetic coils
     private boolean checkKineticCoils(int aX, int aY, int aZ) {
     	return (isKineticCoil(aX + 6, aY, aZ)) && (isKineticCoil(aX - 6, aY, aZ)) && (isKineticCoil(aX + 6, aY, aZ + 1)) && (isKineticCoil(aX + 6, aY, aZ - 1))// Horisontal Ring
     			&& (isKineticCoil(aX + 6, aY, aZ + 2)) && (isKineticCoil(aX + 6, aY, aZ - 2)) && (isKineticCoil(aX + 5, aY, aZ + 3)) && (isKineticCoil(aX + 5, aY, aZ - 3))
@@ -228,17 +239,24 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     			&& (isKineticCoil(aX - 2, aY, aZ + 6)) && (isKineticCoil(aX - 2, aY, aZ - 6)) && (isKineticCoil(aX - 3, aY, aZ + 5)) && (isKineticCoil(aX - 3, aY, aZ - 5))
     			&& (isKineticCoil(aX - 4, aY, aZ + 4)) && (isKineticCoil(aX - 4, aY, aZ - 4)) && (isKineticCoil(aX - 5, aY, aZ + 3)) && (isKineticCoil(aX - 5, aY, aZ - 3))
     			&& (isKineticCoil(aX - 6, aY, aZ + 2)) && (isKineticCoil(aX - 6, aY, aZ - 2)) && (isKineticCoil(aX - 6, aY, aZ + 1)) && (isKineticCoil(aX - 6, aY, aZ - 1))
-    			&& (isKineticCoil(aX + 5, aY, aZ)) && (isKineticCoil(aX - 5, aY, aZ)) && (isKineticCoil(aX + 5, aY + 1, aZ)) && (isKineticCoil(aX + 5, aY - 1, aZ))//Vertical Ring
+    			&& (((isKineticCoil(aX + 5, aY, aZ)) && (isKineticCoil(aX - 5, aY, aZ)) && (isKineticCoil(aX + 5, aY + 1, aZ)) && (isKineticCoil(aX + 5, aY - 1, aZ))//Vertical Ring in X Plane
     			&& (isKineticCoil(aX + 5, aY + 2, aZ)) && (isKineticCoil(aX + 5, aY - 2, aZ)) && (isKineticCoil(aX + 4, aY + 3, aZ)) && (isKineticCoil(aX + 4, aY - 3, aZ))
     			&& (isKineticCoil(aX + 3, aY + 4, aZ)) && (isKineticCoil(aX + 3, aY - 4, aZ)) && (isKineticCoil(aX + 2, aY + 5, aZ)) && (isKineticCoil(aX + 2, aY - 5, aZ))
     			&& (isKineticCoil(aX + 1, aY + 5, aZ)) && (isKineticCoil(aX + 1, aY - 5, aZ)) && (isKineticCoil(aX, aY + 5, aZ)) && (isKineticCoil(aX, aY - 5, aZ))
     			&& (isKineticCoil(aX - 1, aY + 5, aZ)) && (isKineticCoil(aX - 1, aY - 5, aZ)) && (isKineticCoil(aX - 2, aY + 5, aZ)) && (isKineticCoil(aX - 2, aY - 5, aZ))
     			&& (isKineticCoil(aX - 3, aY + 4, aZ)) && (isKineticCoil(aX - 3, aY - 4, aZ)) && (isKineticCoil(aX - 4, aY + 3, aZ)) && (isKineticCoil(aX - 4, aY - 3, aZ))
-    			&& (isKineticCoil(aX - 5, aY + 2, aZ)) && (isKineticCoil(aX - 5, aY - 2, aZ)) && (isKineticCoil(aX - 5, aY + 1, aZ)) && (isKineticCoil(aX - 5, aY - 1, aZ));
+    			&& (isKineticCoil(aX - 5, aY + 2, aZ)) && (isKineticCoil(aX - 5, aY - 2, aZ)) && (isKineticCoil(aX - 5, aY + 1, aZ)) && (isKineticCoil(aX - 5, aY - 1, aZ)))
+    			|| ((isKineticCoil(aX, aY, aZ + 5)) && (isKineticCoil(aX, aY, aZ - 5)) && (isKineticCoil(aX, aY + 1, aZ + 5)) && (isKineticCoil(aX, aY - 1, aZ + 5))//Vertical Ring in Z Plane
+    	    	&& (isKineticCoil(aX, aY + 2, aZ + 5)) && (isKineticCoil(aX, aY - 2, aZ + 5)) && (isKineticCoil(aX, aY + 3, aZ + 4)) && (isKineticCoil(aX, aY - 3, aZ + 4))
+    	    	&& (isKineticCoil(aX, aY + 4, aZ + 3)) && (isKineticCoil(aX, aY - 4, aZ + 3)) && (isKineticCoil(aX, aY + 5, aZ + 2)) && (isKineticCoil(aX, aY - 5, aZ + 2))
+    	    	&& (isKineticCoil(aX, aY + 5, aZ + 1)) && (isKineticCoil(aX, aY - 5, aZ + 1)) && (isKineticCoil(aX, aY + 5, aZ)) && (isKineticCoil(aX, aY - 5, aZ))
+    	    	&& (isKineticCoil(aX, aY + 5, aZ - 1)) && (isKineticCoil(aX, aY - 5, aZ - 1)) && (isKineticCoil(aX, aY + 5, aZ - 2)) && (isKineticCoil(aX, aY - 5, aZ - 2))
+    	    	&& (isKineticCoil(aX, aY + 4, aZ - 3)) && (isKineticCoil(aX, aY - 4, aZ - 3)) && (isKineticCoil(aX, aY + 3, aZ - 4)) && (isKineticCoil(aX, aY - 3, aZ - 4))
+    	    	&& (isKineticCoil(aX, aY + 2, aZ - 5)) && (isKineticCoil(aX, aY - 2, aZ - 5)) && (isKineticCoil(aX, aY + 1, aZ - 5)) && (isKineticCoil(aX, aY - 1, aZ - 5))));
     }
     
-  //Check magnetic coils
-    private boolean checkMagneticCoils(int aX, int aY, int aZ) {
+    //Check magnetic coils
+    private boolean checkMagneticCoilsInXPlane(int aX, int aY, int aZ) {
     	return (isMagneticCoil(aX + 7, aY + 1, aZ + 2)) && (isMagneticCoil(aX + 7, aY + 1, aZ - 2)) && (isMagneticCoil(aX + 7, aY - 1, aZ + 2)) && (isMagneticCoil(aX + 7, aY - 1, aZ - 2))//Horisontal
     			&& (isMagneticCoil(aX + 6, aY + 1, aZ + 3)) && (isMagneticCoil(aX + 6, aY + 1, aZ - 3)) && (isMagneticCoil(aX + 6, aY - 1, aZ + 3)) && (isMagneticCoil(aX + 6, aY - 1, aZ - 3))
     			&& (isMagneticCoil(aX + 5, aY + 1, aZ + 4)) && (isMagneticCoil(aX + 5, aY + 1, aZ - 4)) && (isMagneticCoil(aX + 5, aY - 1, aZ + 4)) && (isMagneticCoil(aX + 5, aY - 1, aZ - 4))
@@ -250,8 +268,11 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     			&& (isMagneticCoil(aX - 5, aY + 1, aZ + 4)) && (isMagneticCoil(aX - 5, aY + 1, aZ - 4)) && (isMagneticCoil(aX - 5, aY - 1, aZ + 4)) && (isMagneticCoil(aX - 5, aY - 1, aZ - 4))
     			&& (isMagneticCoil(aX - 4, aY + 1, aZ + 5)) && (isMagneticCoil(aX - 4, aY + 1, aZ - 5)) && (isMagneticCoil(aX - 4, aY - 1, aZ + 5)) && (isMagneticCoil(aX - 4, aY - 1, aZ - 5))
     			&& (isMagneticCoil(aX - 3, aY + 1, aZ + 6)) && (isMagneticCoil(aX - 3, aY + 1, aZ - 6)) && (isMagneticCoil(aX - 3, aY - 1, aZ + 6)) && (isMagneticCoil(aX - 3, aY - 1, aZ - 6))
-    			&& (isMagneticCoil(aX - 2, aY + 1, aZ + 7)) && (isMagneticCoil(aX - 2, aY + 1, aZ - 7)) && (isMagneticCoil(aX - 2, aY - 1, aZ + 7)) && (isMagneticCoil(aX - 2, aY - 1, aZ - 7))
-    			&& (isMagneticCoil(aX + 7, aY + 2, aZ + 1)) && (isMagneticCoil(aX + 7, aY - 2, aZ + 1)) && (isMagneticCoil(aX + 7, aY + 2, aZ - 1)) && (isMagneticCoil(aX + 7, aY - 2, aZ - 1))//Vertical
+    			&& (isMagneticCoil(aX - 2, aY + 1, aZ + 7)) && (isMagneticCoil(aX - 2, aY + 1, aZ - 7)) && (isMagneticCoil(aX - 2, aY - 1, aZ + 7)) && (isMagneticCoil(aX - 2, aY - 1, aZ - 7));
+    }
+    
+    private boolean checkMagneticCoilsInYPlane(int aX, int aY, int aZ) {
+    	return (((isMagneticCoil(aX + 7, aY + 2, aZ + 1)) && (isMagneticCoil(aX + 7, aY - 2, aZ + 1)) && (isMagneticCoil(aX + 7, aY + 2, aZ - 1)) && (isMagneticCoil(aX + 7, aY - 2, aZ - 1))//Vertical
     			&& (isMagneticCoil(aX + 7, aY + 3, aZ + 1)) && (isMagneticCoil(aX + 7, aY - 3, aZ + 1)) && (isMagneticCoil(aX + 7, aY + 3, aZ - 1)) && (isMagneticCoil(aX + 7, aY - 3, aZ - 1))
     			&& (isMagneticCoil(aX + 6, aY + 4, aZ + 1)) && (isMagneticCoil(aX + 6, aY - 4, aZ + 1)) && (isMagneticCoil(aX + 6, aY + 4, aZ - 1)) && (isMagneticCoil(aX + 6, aY - 4, aZ - 1))
     			&& (isMagneticCoil(aX + 5, aY + 5, aZ + 1)) && (isMagneticCoil(aX + 5, aY - 5, aZ + 1)) && (isMagneticCoil(aX + 5, aY + 5, aZ - 1)) && (isMagneticCoil(aX + 5, aY - 5, aZ - 1))
@@ -267,35 +288,80 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     			&& (isMagneticCoil(aX - 4, aY + 6, aZ + 1)) && (isMagneticCoil(aX - 4, aY - 6, aZ + 1)) && (isMagneticCoil(aX - 4, aY + 6, aZ - 1)) && (isMagneticCoil(aX - 4, aY - 6, aZ - 1))
     			&& (isMagneticCoil(aX - 3, aY + 7, aZ + 1)) && (isMagneticCoil(aX - 3, aY - 7, aZ + 1)) && (isMagneticCoil(aX - 3, aY + 7, aZ - 1)) && (isMagneticCoil(aX - 3, aY - 7, aZ - 1))
     			&& (isMagneticCoil(aX - 2, aY + 7, aZ + 1)) && (isMagneticCoil(aX - 2, aY - 7, aZ + 1)) && (isMagneticCoil(aX - 2, aY + 7, aZ - 1)) && (isMagneticCoil(aX - 2, aY - 7, aZ - 1))
-    			&& (isMagneticCoil(aX - 1, aY + 7, aZ + 1)) && (isMagneticCoil(aX - 1, aY - 7, aZ + 1)) && (isMagneticCoil(aX - 1, aY + 7, aZ - 1)) && (isMagneticCoil(aX - 1, aY - 7, aZ - 1));
+    			&& (isMagneticCoil(aX - 1, aY + 7, aZ + 1)) && (isMagneticCoil(aX - 1, aY - 7, aZ + 1)) && (isMagneticCoil(aX - 1, aY + 7, aZ - 1)) && (isMagneticCoil(aX - 1, aY - 7, aZ - 1)))
+    			|| ((isMagneticCoil(aX + 1, aY + 2, aZ + 7)) && (isMagneticCoil(aX + 1, aY - 2, aZ + 7)) && (isMagneticCoil(aX - 1, aY + 2, aZ + 7)) && (isMagneticCoil(aX - 1, aY - 2, aZ + 7))//Vertical
+    	    	&& (isMagneticCoil(aX + 1, aY + 3, aZ + 7)) && (isMagneticCoil(aX + 1, aY - 3, aZ + 7)) && (isMagneticCoil(aX - 1, aY + 3, aZ + 7)) && (isMagneticCoil(aX - 1, aY - 3, aZ + 7))
+    	    	&& (isMagneticCoil(aX + 1, aY + 4, aZ + 6)) && (isMagneticCoil(aX + 1, aY - 4, aZ + 6)) && (isMagneticCoil(aX - 1, aY + 4, aZ + 6)) && (isMagneticCoil(aX - 1, aY - 4, aZ + 6))
+    	    	&& (isMagneticCoil(aX + 1, aY + 5, aZ + 5)) && (isMagneticCoil(aX + 1, aY - 5, aZ + 5)) && (isMagneticCoil(aX - 1, aY + 5, aZ + 5)) && (isMagneticCoil(aX - 1, aY - 5, aZ + 5))
+    	    	&& (isMagneticCoil(aX + 1, aY + 6, aZ + 4)) && (isMagneticCoil(aX + 1, aY - 6, aZ + 4)) && (isMagneticCoil(aX - 1, aY + 6, aZ + 4)) && (isMagneticCoil(aX - 1, aY - 6, aZ + 4))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ + 3)) && (isMagneticCoil(aX + 1, aY - 7, aZ + 3)) && (isMagneticCoil(aX - 1, aY + 7, aZ + 3)) && (isMagneticCoil(aX - 1, aY - 7, aZ + 3))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ + 2)) && (isMagneticCoil(aX + 1, aY - 7, aZ + 2)) && (isMagneticCoil(aX - 1, aY + 7, aZ + 2)) && (isMagneticCoil(aX - 1, aY - 7, aZ + 2))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ + 1)) && (isMagneticCoil(aX + 1, aY - 7, aZ + 1)) && (isMagneticCoil(aX - 1, aY + 7, aZ + 1)) && (isMagneticCoil(aX - 1, aY - 7, aZ + 1))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ)) && (isMagneticCoil(aX + 1, aY - 7, aZ)) && (isMagneticCoil(aX - 1, aY + 7, aZ)) && (isMagneticCoil(aX - 1, aY - 7, aZ))
+    	    	&& (isMagneticCoil(aX + 1, aY + 2, aZ - 7)) && (isMagneticCoil(aX + 1, aY - 2, aZ - 7)) && (isMagneticCoil(aX - 1, aY + 2, aZ - 7)) && (isMagneticCoil(aX - 1, aY - 2, aZ - 7))//Vertical
+    	    	&& (isMagneticCoil(aX + 1, aY + 3, aZ - 7)) && (isMagneticCoil(aX + 1, aY - 3, aZ - 7)) && (isMagneticCoil(aX - 1, aY + 3, aZ - 7)) && (isMagneticCoil(aX - 1, aY - 3, aZ - 7))
+    	    	&& (isMagneticCoil(aX + 1, aY + 4, aZ - 6)) && (isMagneticCoil(aX + 1, aY - 4, aZ - 6)) && (isMagneticCoil(aX - 1, aY + 4, aZ - 6)) && (isMagneticCoil(aX - 1, aY - 4, aZ - 6))
+    	    	&& (isMagneticCoil(aX + 1, aY + 5, aZ - 5)) && (isMagneticCoil(aX + 1, aY - 5, aZ - 5)) && (isMagneticCoil(aX - 1, aY + 5, aZ - 5)) && (isMagneticCoil(aX - 1, aY - 5, aZ - 5))
+    	    	&& (isMagneticCoil(aX + 1, aY + 6, aZ - 4)) && (isMagneticCoil(aX + 1, aY - 6, aZ - 4)) && (isMagneticCoil(aX - 1, aY + 6, aZ - 4)) && (isMagneticCoil(aX - 1, aY - 6, aZ - 4))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ - 3)) && (isMagneticCoil(aX + 1, aY - 7, aZ - 3)) && (isMagneticCoil(aX - 1, aY + 7, aZ - 3)) && (isMagneticCoil(aX - 1, aY - 7, aZ - 3))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ - 2)) && (isMagneticCoil(aX + 1, aY - 7, aZ - 2)) && (isMagneticCoil(aX - 1, aY + 7, aZ - 2)) && (isMagneticCoil(aX - 1, aY - 7, aZ - 2))
+    	    	&& (isMagneticCoil(aX + 1, aY + 7, aZ - 1)) && (isMagneticCoil(aX + 1, aY - 7, aZ - 1)) && (isMagneticCoil(aX - 1, aY + 7, aZ - 1)) && (isMagneticCoil(aX - 1, aY - 7, aZ - 1))));
     }
     
-    //Check core components
+    //Check core casing
     private boolean checkCoreCasings(int aX, int aY, int aZ) {
-    	return (isCoreMachineCasing(aX + 1, aY, aZ - 1)) && (isCoreMachineCasing(aX + 1, aY, aZ + 1)) && (isCoreMachineCasing(aX - 1, aY, aZ - 1)) && (isCoreMachineCasing(aX - 1, aY, aZ + 1))
-    			&& (isCoreMachineCasing(aX + 1, aY - 1, aZ)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ)) && (isCoreMachineCasing(aX, aY - 1, aZ + 1)) && (isCoreMachineCasing(aX, aY - 1, aZ - 1))
-    			&& (isCoreMachineCasing(aX + 1, aY + 1, aZ)) && (isCoreMachineCasing(aX - 1, aY + 1, aZ)) && (isCoreMachineCasing(aX, aY + 1, aZ + 1)) && (isCoreMachineCasing(aX, aY + 1, aZ - 1))
-    			&& (isCoreMachineCasing(aX, aY + 2, aZ)) && (isCoreMachineCasing(aX, aY - 2, aZ));
+    	return (isCoreMachineCasing(aX + 2, aY, aZ)) && (isCoreMachineCasing(aX + 2, aY, aZ + 1)) && (isCoreMachineCasing(aX + 2, aY, aZ - 1))//Central layer
+    			&& (isCoreMachineCasing(aX - 2, aY, aZ)) && (isCoreMachineCasing(aX - 2, aY, aZ + 1)) && (isCoreMachineCasing(aX - 2, aY, aZ - 1))
+    			&&(isCoreMachineCasing(aX, aY, aZ + 2)) && (isCoreMachineCasing(aX + 1, aY, aZ + 2)) && (isCoreMachineCasing(aX - 1, aY, aZ + 2))
+    			&&(isCoreMachineCasing(aX, aY, aZ - 2)) && (isCoreMachineCasing(aX + 1, aY, aZ - 2)) && (isCoreMachineCasing(aX - 1, aY, aZ - 2))
+    			&&(isCoreMachineCasing(aX + 1, aY, aZ + 1)) && (isCoreMachineCasing(aX + 1, aY, aZ - 1)) && (isCoreMachineCasing(aX - 1, aY, aZ + 1)) && (isCoreMachineCasing(aX - 1, aY, aZ - 1))
+    			&&(isCoreMachineCasing(aX + 2, aY + 1, aZ)) && (isCoreMachineCasing(aX + 1, aY + 1, aZ)) && (isCoreMachineCasing(aX + 1, aY + 1, aZ + 1)) && (isCoreMachineCasing(aX + 1, aY + 1, aZ - 1))//Upper layer
+    			&&(isCoreMachineCasing(aX, aY + 1, aZ + 2)) && (isCoreMachineCasing(aX, aY + 1, aZ + 1)) && (isCoreMachineCasing(aX, aY + 1, aZ - 1)) && (isCoreMachineCasing(aX, aY + 1, aZ - 2))
+    			&&(isCoreMachineCasing(aX - 2, aY + 1, aZ)) && (isCoreMachineCasing(aX - 1, aY + 1, aZ)) && (isCoreMachineCasing(aX - 1, aY + 1, aZ + 1)) && (isCoreMachineCasing(aX - 1, aY + 1, aZ - 1))
+    			&&(isCoreMachineCasing(aX + 2, aY - 1, aZ)) && (isCoreMachineCasing(aX + 1, aY - 1, aZ)) && (isCoreMachineCasing(aX + 1, aY - 1, aZ + 1)) && (isCoreMachineCasing(aX + 1, aY - 1, aZ - 1))//Lower layer
+    			&&(isCoreMachineCasing(aX, aY - 1, aZ + 2)) && (isCoreMachineCasing(aX, aY - 1, aZ + 1)) && (isCoreMachineCasing(aX, aY - 1, aZ - 1)) && (isCoreMachineCasing(aX, aY - 1, aZ - 2))
+    			&&(isCoreMachineCasing(aX - 2, aY - 1, aZ)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ + 1)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ - 1));
     }
     
-    private boolean checkCoreCoil(int aX, int aY, int aZ) {
-    	return (isCoreCoil(aX + 1, aY, aZ)) && (isCoreCoil(aX - 1, aY, aZ)) 
-    			&& (isCoreCoil(aX, aY, aZ + 1)) && (isCoreCoil(aX, aY, aZ - 1))
-    			&& (isCoreCoil(aX, aY + 1, aZ)) && (isCoreCoil(aX, aY - 1, aZ));
+    //Check loading chamber
+    private boolean checkLoadingChamber(int aX, int aY, int aZ) {
+    	return (isLoadingChamberCasing(aX + 1, aY, aZ)) && (isLoadingChamberCasing(aX - 1, aY, aZ)) 
+    			&& (isLoadingChamberCasing(aX, aY, aZ + 1)) && (isLoadingChamberCasing(aX, aY, aZ - 1))
+    			&& (isLoadingChamberCasing(aX, aY + 1, aZ)) && (isLoadingChamberCasing(aX, aY - 1, aZ));
+    }
+    
+    //Check intermix chamber
+    private boolean checkIntermixChamber(int aX, int aY, int aZ) {
+    	if (xDir == 1 || xDir == -1) {
+    		return (isIntermixChamberCasing(aX, aY + 2, aZ)) && (isIntermixChamberCasing(aX + 1, aY + 2, aZ)) && (isIntermixChamberCasing(aX - 1, aY + 2, aZ))
+        			&&(isIntermixChamberCasing(aX, aY - 2, aZ)) && (isIntermixChamberCasing(aX + 1, aY - 2, aZ)) && (isIntermixChamberCasing(aX - 1, aY - 2, aZ));
+    	}
+    	return (isIntermixChamberCasing(aX, aY + 2, aZ)) && (isIntermixChamberCasing(aX, aY + 2, aZ + 1)) && (isIntermixChamberCasing(aX, aY + 2, aZ - 1))
+    			&&(isIntermixChamberCasing(aX, aY - 2, aZ)) && (isIntermixChamberCasing(aX, aY - 2, aZ + 1)) && (isIntermixChamberCasing(aX, aY - 2, aZ - 1));
     }
 
-    //Check Input and Output Blocks, else turn in common Casing
+    //Check Dynamo Hatch and Casing on his side
     private boolean addIfEnergyExtractor(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
-        if (addDynamoToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY, aZ), 44)) {
-            return true;
-        }
-        return isAdvancedMachineCasing(aX, aY, aZ);
+    	
+    	if(xDir == 1 || xDir == -1) {
+    		return (addDynamoToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY, aZ), 44))
+            		&& isAdvancedMachineCasing(aX, aY, aZ - 1) && isAdvancedMachineCasing(aX, aY, aZ + 1);
+    	}
+        return (addDynamoToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY, aZ), 44))
+        		&& isAdvancedMachineCasing(aX - 1, aY, aZ) && isAdvancedMachineCasing(aX + 1, aY, aZ);
     }
-    private boolean addIfFluidInjector(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
-        if (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY, aZ), 56)) {
-            return true;
-        }
-        return isCoreMachineCasing(aX, aY, aZ);
+    
+    private boolean addIfFluidIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
+    	if (xDir == 1 || xDir == -1) {
+    		return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 31))
+    				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 31)))
+    				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 31))
+    				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 31))));
+    	}
+        return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 31))
+				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)))
+				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 31))
+				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31))));
     }
     
     //Check needed block for Ring
@@ -315,17 +381,17 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     
     //Check needed Core Casing
     private boolean isCoreMachineCasing(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 8);
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 6);
     }
     
     //Check needed Core coil
-    private boolean isCoreCoil(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings5) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 4);
+    private boolean isLoadingChamberCasing(int aX, int aY, int aZ) {
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings3) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 10);
     }
     
     //Check Core Block
-    private boolean isCore(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings2) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 5);
+    private boolean isIntermixChamberCasing(int aX, int aY, int aZ) {
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings2) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 15);
     }
     
     /*Use for update machine ???
@@ -338,37 +404,6 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     public boolean onRunningTick(ItemStack aStack) {
     	
     }*/
-    
-    /*CHANGE!!! Change on self block
-    public Block getCasingBlock() {
-        return GregTech_API.sBlockCasings4;
-    }
-
-    public byte getCasingMeta() {
-        return 2;
-    }
-
-    public Block getIntakeBlock() {
-        return GregTech_API.sBlockCasings4;
-    }
-
-    public byte getIntakeMeta() {
-        return 13;
-    }
-
-    public Block getGearboxBlock() {
-        return GregTech_API.sBlockCasings2;
-    }
-
-    public byte getGearboxMeta() {
-        return 4;
-    }
-     */
-    
-    //Texture for all blocks (Hatch)
-    public byte getCasingTextureIndex() {
-        return 50;
-    }
     
     /*Change Texture if machine active
     public boolean turnCasingActive(boolean status) {
@@ -389,16 +424,10 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         }
         return true;
     }*/
-
-    
-    //Add additional blocks to Machine list. Use in checkRecipes object
-    private boolean addToMachineList(IGregTechTileEntity tTileEntity) {
-        return ((addMaintenanceToMachineList(tTileEntity, getCasingTextureIndex())) || (addInputToMachineList(tTileEntity, getCasingTextureIndex())) || (addOutputToMachineList(tTileEntity, getCasingTextureIndex())) || (addMufflerToMachineList(tTileEntity, getCasingTextureIndex())));
-    }
     
     @Override
     public IMetaTileEntity newMetaEntity(IGregTechTileEntity aTileEntity) {
-        return new GT_MetaTileEntity_DieselEngine(this.mName);
+        return new GT_MetaTileEntity_AntimatterReactor(this.mName);
     }
     
     //Damage for item in GUI
@@ -438,7 +467,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return false;
     }
     
-    /*CHANGE!!! Info for netCard? @.@
+    //CHANGE!!! Info for netCard? @.@
     public String[] getInfoData() {
         return new String[]{
             "Diesel Engine",
@@ -452,5 +481,5 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     @Override
     public boolean isGivingInformation() {
         return true;
-    }*/
+    }
 }
