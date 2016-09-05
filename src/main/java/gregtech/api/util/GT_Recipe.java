@@ -509,6 +509,8 @@ public class GT_Recipe {
         public static final GT_Recipe_Map_Fuel sLargeNaquadahReactorFuels = new GT_Recipe_Map_Fuel(new HashSet<GT_Recipe>(10), "gt.recipe.largenaquadahreactor", "Large Naquadah Reactor", null, RES_PATH_GUI + "basicmachines/Default", 1, 1, 0, 0, 1, "Fuel Value: ", 1000, " EU", true, true);
         public static final GT_Recipe_Map_Fuel sFluidNaquadahReactorFuels = new GT_Recipe_Map_Fuel(new HashSet<GT_Recipe>(10), "gt.recipe.fluidnaquadahreactor", "Fluid Naquadah Reactor", null, RES_PATH_GUI + "basicmachines/Default", 1, 1, 0, 0, 1, "Fuel Value: ", 1000, " EU", true, true);
         
+        public static final GT_Recipe_Map_Fuel sAntimatterReactorFuels = new GT_Recipe_Map_Fuel(new HashSet<GT_Recipe>(10), "gt.recipe.antimetterreactor", "Antimatter Reactor", null, RES_PATH_GUI + "basicmachines/Default", 2, 1, 2, 1, 1, "Reaction Time: ", 1, " sec", true, true);
+        
         /**
          * HashMap of Recipes based on their Items
          */

@@ -364,7 +364,7 @@ public enum Materials implements IColorModulationContainer, ISubTagContainer {
 	/**
 	 * Not possible to determine exact Components
 	 */
-	Antimatter			(  -1, TextureSet.SET_NONE				,   1.0F,      0,  0, 0                                     , 255, 255, 255,   0,	"Antimatter"					,    0,       0,         -1,    0, false, false,   1,   1,   1, Dyes.dyePink		, Arrays.asList(new TC_AspectStack(TC_Aspects.POTENTIA, 9), new TC_AspectStack(TC_Aspects.PERFODIO, 8))),
+	Antimatter			( 745, TextureSet.SET_FLUID				,   1.0F,      0,  1,         16                            , 255, 255,   0,   0,	"Antimatter"					,    1,       0,         -1,    0, false, false,   1,   1,   1, Dyes.dyePurple		),
 	BioFuel				( 705, TextureSet.SET_FLUID				,   1.0F,      0,  0,         16                            , 255, 128,   0,   0,	"Biofuel"						,    0,       6,         -1,    0, false, false,   1,   1,   1, Dyes.dyeOrange		),
 	Biomass				( 704, TextureSet.SET_FLUID				,   1.0F,      0,  0,         16                            ,   0, 255,   0,   0,	"Biomass"						,    3,       8,         -1,    0, false, false,   1,   1,   1, Dyes.dyeGreen		),
 	Cheese				( 894, TextureSet.SET_FINE				,   1.0F,      0,  0, 1    |8                               , 255, 255,   0,   0,	"Cheese"						,    0,       0,        320,    0, false, false,   1,   1,   1, Dyes.dyeYellow		),
