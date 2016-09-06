@@ -15,7 +15,9 @@ import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch;
 import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch_Dynamo;
 import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch_Energy;
 import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch_Input;
+import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch_InputBus;
 import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch_Output;
+import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_Hatch_OutputBus;
 import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_MultiBlockBase;
 import gregtech.api.objects.GT_RenderedTexture;
 import gregtech.api.util.GT_Recipe;
@@ -29,15 +31,14 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_MultiBlockBase {
-	protected int fuelConsumption = 0;
-    protected int fuelValue = 0;
-    protected int fuelRemaining = 0;
-    protected boolean boostEu = false;
+	
     protected int xDir = 0, zDir = 0;
     public GT_Recipe mLastRecipe;
+    public FluidStack mColant = null;
 	
     public GT_MetaTileEntity_AntimatterReactor(int aID, String aName, String aNameRegional, int tier) {
         super(aID, aName, aNameRegional);
@@ -91,41 +92,58 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return new GT_GUIContainer_FusionReactor(aPlayerInventory, aBaseMetaTileEntity, getLocalName(), "FusionComputer.png", GT_Recipe.GT_Recipe_Map.sFusionRecipes.mNEIName);
     }
     
-    //CHANGE!!! Check Recipes. Compare this two
      @Override
     public boolean checkRecipe(ItemStack aStack) {
-        /*ArrayList<FluidStack> tFluidList = getStoredFluids();
-        for (int i = 0; i < tFluidList.size() - 1; i++) {
-            for (int j = i + 1; j < tFluidList.size(); j++) {
-                if (GT_Utility.areFluidsEqual((FluidStack) tFluidList.get(i), (FluidStack) tFluidList.get(j))) {
-                    if (((FluidStack) tFluidList.get(i)).amount >= ((FluidStack) tFluidList.get(j)).amount) {
-                        tFluidList.remove(j--);
-                    } else {
-                        tFluidList.remove(i--);
-                        break;
-                    }
-                }
-            }
-        }
-        if (tFluidList.size() > 1) {
-            FluidStack[] tFluids = tFluidList.toArray(new FluidStack[tFluidList.size()]);
-            GT_Recipe tRecipe = GT_Recipe.GT_Recipe_Map.sFusionRecipes.findRecipe(this.getBaseMetaTileEntity(), this.mLastRecipe, false, GT_Values.V[8], tFluids, new ItemStack[]{});
-            if (tRecipe == null && !mRunningOnLoad) {
-                //turnCasingActive(false);
-                this.mLastRecipe = null;
-                return false;
-            }
-            if (mRunningOnLoad || tRecipe.isRecipeInputEqual(true, tFluids, new ItemStack[]{})) {
-                this.mLastRecipe = tRecipe;
-                this.mEUt = this.mLastRecipe.mEUt;
-                this.mMaxProgresstime = this.mLastRecipe.mDuration;
-                this.mEfficiencyIncrease = 10000;
-                this.mOutputFluids = this.mLastRecipe.mFluidOutputs;
-                //turnCasingActive(true);
-                mRunningOnLoad = false;
-                return true;
-            }
-        }*/
+    	 ArrayList<ItemStack> tInputList = getStoredInputs();
+         for (int i = 0; i < tInputList.size() - 1; i++) {
+             for (int j = i + 1; j < tInputList.size(); j++) {
+                 if (GT_Utility.areStacksEqual((ItemStack) tInputList.get(i), (ItemStack) tInputList.get(j))) {
+                     if (((ItemStack) tInputList.get(i)).stackSize >= ((ItemStack) tInputList.get(j)).stackSize) {
+                         tInputList.remove(j--);
+                     } else {
+                         tInputList.remove(i--);
+                         break;
+                     }
+                 }
+             }
+         }
+         ItemStack[] tInputs = (ItemStack[]) Arrays.copyOfRange(tInputList.toArray(new ItemStack[tInputList.size()]), 0, 2);
+
+         ArrayList<FluidStack> tFluidList = getStoredFluids();
+         for (int i = 0; i < tFluidList.size() - 1; i++) {
+             for (int j = i + 1; j < tFluidList.size(); j++) {
+                 if (GT_Utility.areFluidsEqual((FluidStack) tFluidList.get(i), (FluidStack) tFluidList.get(j))) {
+                     if (((FluidStack) tFluidList.get(i)).amount >= ((FluidStack) tFluidList.get(j)).amount) {
+                         tFluidList.remove(j--);
+                     } else {
+                         tFluidList.remove(i--);
+                         break;
+                     }
+                 }
+             }
+         }
+         FluidStack[] tFluids = (FluidStack[]) Arrays.copyOfRange(tFluidList.toArray(new FluidStack[tInputList.size()]), 0, 1);
+         
+         if (tInputList.size() > 1) {
+             GT_Recipe tRecipe = GT_Recipe.GT_Recipe_Map_Fuel.sAntimatterReactorFuels.findRecipe(getBaseMetaTileEntity(), false, Long.MAX_VALUE, tFluids, tInputs);
+             if (tRecipe == null) {
+                 //turnCasingActive(false);
+            	 this.mLastRecipe = null;
+                 return false;
+             }
+             if (tRecipe.isRecipeInputEqual(true, tFluids, tInputs)) {
+            	 this.mLastRecipe = tRecipe;
+                 this.mEUt = 524288;
+                 this.mMaxProgresstime = this.mLastRecipe.mSpecialValue;
+                 this.mEfficiencyIncrease = 10000;
+                 this.mOutputFluids = this.mLastRecipe.mFluidOutputs;
+                 this.mOutputItems = this.mLastRecipe.mOutputs;
+                 //turnCasingActive(true);
+                 //mRunningOnLoad = false;
+                 updateSlots();
+                 return true;
+             }
+         }
         return false;
     }
     
@@ -160,20 +178,40 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         		&& (checkMagneticCoilsInXPlane(xCenter, yCenter, zCenter)) && (checkMagneticCoilsInYPlane(xCenter, yCenter, zCenter)) // Check Magnetic Ring
         		&& (checkCoreCasings(xCenter, yCenter, zCenter)) && (checkLoadingChamber(xCenter, yCenter, zCenter)) //Check Core Components
         		&& (checkIntermixChamber(xCenter, yCenter, zCenter)) // Check Intermix Chamber
-        		&& (addIfEnergyExtractor(xCenter + xDir * 7, yCenter, zCenter + zDir * 7 , aBaseMetaTileEntity))
-        		/*&& (this.mDynamoHatches.size() >= 1) && (this.mInputHatches.size() >= 2)*/) {
-           /* if (this.mDynamoHatches != null) {
+        		&& (addIfEnergyExtractor(xCenter + xDir * 7, yCenter, zCenter + zDir * 7, aBaseMetaTileEntity))
+        		&& (addIfFluidIO(xCenter, yCenter, zCenter, aBaseMetaTileEntity))
+        		&& (addIfItemIO(aBaseMetaTileEntity.getXCoord(), aBaseMetaTileEntity.getYCoord(), aBaseMetaTileEntity.getZCoord(), aBaseMetaTileEntity))
+        		&& (this.mDynamoHatches.size() == 1) && (this.mInputHatches.size() == 2) && (this.mOutputHatches.size() == 2) && (this.mInputBusses.size() == 1) && (this.mOutputBusses.size() == 1)) {
+            if (this.mDynamoHatches != null) {
                 for (int i = 0; i < this.mDynamoHatches.size(); i++) {
-                    if (this.mDynamoHatches.get(i).mTier < 9)
+                    if (this.mDynamoHatches.get(i).mTier < 7)
+                        return false;
+                }
+            }
+            if (this.mInputBusses != null) {
+                for (int i = 0; i < this.mInputBusses.size(); i++) {
+                    if (this.mInputBusses.get(i).mTier < 7)
+                        return false;
+                }
+            }
+            if (this.mOutputBusses != null) {
+                for (int i = 0; i < this.mOutputBusses.size(); i++) {
+                    if (this.mOutputBusses.get(i).mTier < 7)
                         return false;
                 }
             }
             if (this.mInputHatches != null) {
                 for (int i = 0; i < this.mInputHatches.size(); i++) {
-                    if (this.mInputHatches.get(i).mTier < 9)
+                    if (this.mInputHatches.get(i).mTier < 7)
                         return false;
                 }
-            }*/
+            }
+            if (this.mOutputHatches != null) {
+                for (int i = 0; i < this.mOutputHatches.size(); i++) {
+                    if (this.mOutputHatches.get(i).mTier < 7)
+                        return false;
+                }
+            }
             mWrench = true;
             mScrewdriver = true;
             mSoftHammer = true;
@@ -332,6 +370,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     
     //Check intermix chamber
     private boolean checkIntermixChamber(int aX, int aY, int aZ) {
+    	
     	if (xDir == 1 || xDir == -1) {
     		return (isIntermixChamberCasing(aX, aY + 2, aZ)) && (isIntermixChamberCasing(aX + 1, aY + 2, aZ)) && (isIntermixChamberCasing(aX - 1, aY + 2, aZ))
         			&&(isIntermixChamberCasing(aX, aY - 2, aZ)) && (isIntermixChamberCasing(aX + 1, aY - 2, aZ)) && (isIntermixChamberCasing(aX - 1, aY - 2, aZ));
@@ -352,6 +391,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     }
     
     private boolean addIfFluidIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
+    	
     	if (xDir == 1 || xDir == -1) {
     		return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 31))
     				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 31)))
@@ -362,6 +402,22 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
 				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)))
 				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 31))
 				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31))));
+    }
+    
+    private boolean addIfItemIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
+    	
+    	IMetaTileEntity aMetaTileEntity1 = aTileEntity.getIGregTechTileEntity(aX - zDir, aY, aZ - xDir).getMetaTileEntity();
+    	IMetaTileEntity aMetaTileEntity2 = aTileEntity.getIGregTechTileEntity(aX + zDir, aY, aZ + xDir).getMetaTileEntity();
+    	
+    	//Check on Bus. Only Bus may place here
+    	if (aMetaTileEntity1 instanceof GT_MetaTileEntity_Hatch_OutputBus || aMetaTileEntity1 instanceof GT_MetaTileEntity_Hatch_InputBus) {
+    			if (aMetaTileEntity2 instanceof GT_MetaTileEntity_Hatch_OutputBus || aMetaTileEntity2 instanceof GT_MetaTileEntity_Hatch_InputBus) {
+    				//DO NOTHING
+    			} else return false;	
+    	} else return false;
+    	
+        return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - zDir, aY, aZ - xDir), 44)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + zDir, aY, aZ + xDir), 44)))
+				|| ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + zDir, aY, aZ + xDir), 44)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - zDir, aY, aZ - xDir), 44)));
     }
     
     //Check needed block for Ring
@@ -394,36 +450,85 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings2) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 15);
     }
     
-    /*Use for update machine ???
+    @Override
     public void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick) {
-    	
-    }*/
+    	if (aBaseMetaTileEntity.isServerSide()) {
+            if (mEfficiency < 0) mEfficiency = 0;
+            /*if (mRunningOnLoad && checkMachine(aBaseMetaTileEntity, mInventory[1])) {
+                checkRecipe(mInventory[1]);
+                this.mColant = this.mLastRecipe.mFluidInputs[0];
+            }*/
+            if (--mUpdate == 0 || --mStartUpCheck == 0) {
+                mInputHatches.clear();
+                mInputBusses.clear();
+                mOutputHatches.clear();
+                mOutputBusses.clear();
+                mDynamoHatches.clear();
+                mEnergyHatches.clear();
+                mMufflerHatches.clear();
+                mMaintenanceHatches.clear();
+                mMachine = checkMachine(aBaseMetaTileEntity, mInventory[1]);
+            }
+            if (mStartUpCheck < 0) {
+                if (mMachine) {
+                	/*if (depleteInput(mColant) && mMaxProgresstime > 0) {
+                        stopMachine();
+                    }*/
+                    if (getRepairStatus() > 0) {
+                        if (mMaxProgresstime > 0 && doRandomMaintenanceDamage()) {
+                        	if (onRunningTick(mInventory[1])) {
+                        		if (mMaxProgresstime > 0 && ++mProgresstime >= mMaxProgresstime) {
+                                	if (mOutputItems != null)
+                                    	for (ItemStack tStack : mOutputItems) if (tStack != null) addOutput(tStack);
+                                	if (mOutputFluids != null)
+                                    	for (FluidStack tStack : mOutputFluids) if (tStack != null) addOutput(tStack);
+                                	mEfficiency = Math.max(0, Math.min(mEfficiency + mEfficiencyIncrease, getMaxEfficiency(mInventory[1]) - ((getIdealStatus() - getRepairStatus()) * 1000)));
+                                	mOutputItems = null;
+                                	mProgresstime = 0;
+                                	mMaxProgresstime = 0;
+                                	mEfficiencyIncrease = 0;
+                                	//this.mColant = this.mLastRecipe.mFluidInputs[0];
+                                	if (aBaseMetaTileEntity.isAllowedToWork())
+                                    	checkRecipe(mInventory[1]);
+                            	}
+                        	}
+                        } else {
+                            if (aTick % 100 == 0 || aBaseMetaTileEntity.hasWorkJustBeenEnabled() || aBaseMetaTileEntity.hasInventoryBeenModified()) {
+                                //turnCasingActive(mMaxProgresstime > 0);
+                                if (aBaseMetaTileEntity.isAllowedToWork()) {
+                                    checkRecipe(mInventory[1]);
+                                    this.mColant = this.mLastRecipe.mFluidInputs[0];
+                                    this.mColant.amount = 1;
+                                }
+                                if (mMaxProgresstime <= 0)
+                                    mEfficiency = Math.max(0, mEfficiency - 1000);
+                            }
+                        }
+                    } else {
+                        this.mLastRecipe = null;
+                        stopMachine();
+                    }
+                } else {
+                    //turnCasingActive(false);
+                    this.mLastRecipe = null;
+                    stopMachine();
+                }
+            }
+    	}
+    }
     
-    /*Change generating logic
     @Override
     public boolean onRunningTick(ItemStack aStack) {
-    	
-    }*/
-    
-    /*Change Texture if machine active
-    public boolean turnCasingActive(boolean status) {
-        if (this.mEnergyHatches != null) {
-            for (GT_MetaTileEntity_Hatch_Energy hatch : this.mEnergyHatches) {
-                hatch.mMachineBlock = status ? (byte) 52 : (byte) 53;
+    	if (mEUt > 0) {
+            if (depleteInput(mColant)) {
+        		addEnergyOutput(((long) mEUt * mEfficiency) / 10000);
+        		return true;  
             }
         }
-        if (this.mOutputHatches != null) {
-            for (GT_MetaTileEntity_Hatch_Output hatch : this.mOutputHatches) {
-                hatch.mMachineBlock = status ? (byte) 52 : (byte) 53;
-            }
-        }
-        if (this.mInputHatches != null) {
-            for (GT_MetaTileEntity_Hatch_Input hatch : this.mInputHatches) {
-                hatch.mMachineBlock = status ? (byte) 52 : (byte) 53;
-            }
-        }
-        return true;
-    }*/
+    	this.mLastRecipe = null;
+        stopMachine();
+        return false;
+    }
     
     @Override
     public IMetaTileEntity newMetaEntity(IGregTechTileEntity aTileEntity) {
@@ -470,11 +575,8 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     //CHANGE!!! Info for netCard? @.@
     public String[] getInfoData() {
         return new String[]{
-            "Diesel Engine",
+            "Antimatter Reactor",
             "Current Output: "+mEUt+" EU/t",
-            "Fuel Consumption: "+fuelConsumption+"L/t",
-            "Fuel Value: "+fuelValue+" EU/L",
-            "Fuel Remaining: "+fuelRemaining+" Litres",
             "Current Efficiency: "+(mEfficiency/100)+"%"};
     }
     
