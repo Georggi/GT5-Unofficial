@@ -23,6 +23,8 @@ public class GT_Block_Casings5
         GT_LanguageManager.addStringLocalization(getUnlocalizedName() + ".4.name", "HSS-G Coil Block");
         GT_LanguageManager.addStringLocalization(getUnlocalizedName() + ".5.name", "Naquadah Coil Block");
         GT_LanguageManager.addStringLocalization(getUnlocalizedName() + ".6.name", "Naquadah Alloy Coil Block");
+        GT_LanguageManager.addStringLocalization(getUnlocalizedName() + ".7.name", "Magnetic Coil Block");
+        GT_LanguageManager.addStringLocalization(getUnlocalizedName() + ".8.name", "Intermix Chamber Casing");
 
         ItemList.Casing_Coil_Cupronickel.set(new ItemStack(this, 1, 0));
         ItemList.Casing_Coil_Kanthal.set(new ItemStack(this, 1, 1));
@@ -31,6 +33,8 @@ public class GT_Block_Casings5
         ItemList.Casing_Coil_HSSG.set(new ItemStack(this, 1, 4));
         ItemList.Casing_Coil_Naquadah.set(new ItemStack(this, 1, 5));
         ItemList.Casing_Coil_NaquadahAlloy.set(new ItemStack(this, 1, 6));
+        ItemList.Casing_Coil_Magnetic.set(new ItemStack(this, 1, 7));
+        ItemList.Casing_Internix_Chamber.set(new ItemStack(this, 1, 8));
     }
     @Override
     @SideOnly(Side.CLIENT)
@@ -50,6 +54,10 @@ public class GT_Block_Casings5
                 return Textures.BlockIcons.MACHINE_COIL_NAQUADAH.getIcon();
             case 6:
                 return Textures.BlockIcons.MACHINE_COIL_NAQUADAHALLOY.getIcon();
+            case 7:
+                return Textures.BlockIcons.MACHINE_COIL_NAQUADAHALLOY.getIcon();
+            case 8:
+            	return Textures.BlockIcons.MACHINE_CASING_PIPE_TUNGSTENSTEEL.getIcon();
         }
         return Textures.BlockIcons.MACHINE_COIL_CUPRONICKEL.getIcon();
     }
