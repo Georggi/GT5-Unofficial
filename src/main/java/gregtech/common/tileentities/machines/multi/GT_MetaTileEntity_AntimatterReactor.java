@@ -37,8 +37,7 @@ import java.util.Collection;
 public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_MultiBlockBase {
 	
     protected int xDir = 0, zDir = 0;
-    public GT_Recipe mLastRecipe;
-    public FluidStack mColant = null;
+    public FluidStack mInputColant = null, mOutputColant = null;
 	
     public GT_MetaTileEntity_AntimatterReactor(int aID, String aName, String aNameRegional, int tier) {
         super(aID, aName, aNameRegional);
@@ -128,18 +127,18 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
              GT_Recipe tRecipe = GT_Recipe.GT_Recipe_Map_Fuel.sAntimatterReactorFuels.findRecipe(getBaseMetaTileEntity(), false, Long.MAX_VALUE, tFluids, tInputs);
              if (tRecipe == null) {
                  //turnCasingActive(false);
-            	 this.mLastRecipe = null;
                  return false;
              }
              if (tRecipe.isRecipeInputEqual(true, tFluids, tInputs)) {
-            	 this.mLastRecipe = tRecipe;
                  this.mEUt = 524288;
-                 this.mMaxProgresstime = this.mLastRecipe.mSpecialValue;
+                 this.mMaxProgresstime = tRecipe.mSpecialValue;
+                 this.mEfficiency = 10000;
                  this.mEfficiencyIncrease = 10000;
-                 this.mOutputFluids = this.mLastRecipe.mFluidOutputs;
-                 this.mOutputItems = this.mLastRecipe.mOutputs;
+                 this.mInputColant = tRecipe.mFluidInputs[0];
+                 this.mOutputColant = tRecipe.mFluidOutputs[0];
+                 this.mOutputFluids = tRecipe.mFluidOutputs;
+                 this.mOutputItems = tRecipe.mOutputs;
                  //turnCasingActive(true);
-                 //mRunningOnLoad = false;
                  updateSlots();
                  return true;
              }
@@ -176,7 +175,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         if ((checkRingInYPlane(xCenter, yCenter, zCenter)) && (checkRingInVPlane(xCenter, yCenter, zCenter)) //Check rings (Dyson Sphere)
         		&& (checkKineticCoils(xCenter, yCenter, zCenter))//Check Kinetic Ring
         		&& (checkMagneticCoilsInXPlane(xCenter, yCenter, zCenter)) && (checkMagneticCoilsInYPlane(xCenter, yCenter, zCenter)) // Check Magnetic Ring
-        		&& (checkCoreCasings(xCenter, yCenter, zCenter)) && (checkLoadingChamber(xCenter, yCenter, zCenter)) //Check Core Components
+        		&& (checkCoreCasings(xCenter, yCenter, zCenter)) && (checkCoreChamber(xCenter, yCenter, zCenter)) //Check Core Components
         		&& (checkIntermixChamber(xCenter, yCenter, zCenter)) // Check Intermix Chamber
         		&& (addIfEnergyExtractor(xCenter + xDir * 7, yCenter, zCenter + zDir * 7, aBaseMetaTileEntity))
         		&& (addIfFluidIO(xCenter, yCenter, zCenter, aBaseMetaTileEntity))
@@ -224,7 +223,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     	
     }
     
-    //Check horizontal casing rings (Dyson Sphere)
+    //Check horizontal casing rings
     private boolean checkRingInYPlane(int aX, int aY, int aZ) {
         return (isAdvancedMachineCasing(aX + 7, aY - 1, aZ - 1)) && (isAdvancedMachineCasing(aX + 7, aY + 1, aZ - 1)) && (isAdvancedMachineCasing(aX + 7, aY - 1, aZ + 1)) && (isAdvancedMachineCasing(aX + 7, aY + 1, aZ + 1))
         		&& (isAdvancedMachineCasing(aX + 7, aY, aZ - 2)) && (isAdvancedMachineCasing(aX + 7, aY, aZ + 2)) && (isAdvancedMachineCasing(aX + 6, aY, aZ - 3)) && (isAdvancedMachineCasing(aX + 6, aY, aZ + 3))
@@ -242,7 +241,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         		|| ((isAdvancedMachineCasing(aX - 7, aY, aZ + 1)) && (isAdvancedMachineCasing(aX + 7, aY, aZ + 1)) && (isAdvancedMachineCasing(aX - 7, aY, aZ)) && (isAdvancedMachineCasing(aX + 7, aY, aZ)) && (isAdvancedMachineCasing(aX - 7, aY, aZ - 1)) && (isAdvancedMachineCasing(aX + 7, aY, aZ -1))));
     } 
     
-    //Check vertical casing rings (Dyson Sphere)
+    //Check vertical casing rings
     private boolean checkRingInVPlane(int aX, int aY, int aZ) {
         return (isAdvancedMachineCasing(aX, aY - 7, aZ)) && (isAdvancedMachineCasing(aX, aY + 7, aZ))
         		&& (((isAdvancedMachineCasing(aX + 7, aY - 1, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 1, aZ)) && (isAdvancedMachineCasing(aX + 7, aY - 2, aZ)) && (isAdvancedMachineCasing(aX + 7, aY + 2, aZ))
@@ -267,7 +266,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
                 && (isAdvancedMachineCasing(aX, aY - 1, aZ - 7)) && (isAdvancedMachineCasing(aX, aY + 1, aZ - 7))));
     }
     
-    //Check kinetic coils
+    //Check kinetic coils (Dyson Sphere)
     private boolean checkKineticCoils(int aX, int aY, int aZ) {
     	return (isKineticCoil(aX + 6, aY, aZ)) && (isKineticCoil(aX - 6, aY, aZ)) && (isKineticCoil(aX + 6, aY, aZ + 1)) && (isKineticCoil(aX + 6, aY, aZ - 1))// Horisontal Ring
     			&& (isKineticCoil(aX + 6, aY, aZ + 2)) && (isKineticCoil(aX + 6, aY, aZ - 2)) && (isKineticCoil(aX + 5, aY, aZ + 3)) && (isKineticCoil(aX + 5, aY, aZ - 3))
@@ -361,11 +360,11 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     			&&(isCoreMachineCasing(aX - 2, aY - 1, aZ)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ + 1)) && (isCoreMachineCasing(aX - 1, aY - 1, aZ - 1));
     }
     
-    //Check loading chamber
-    private boolean checkLoadingChamber(int aX, int aY, int aZ) {
-    	return (isLoadingChamberCasing(aX + 1, aY, aZ)) && (isLoadingChamberCasing(aX - 1, aY, aZ)) 
-    			&& (isLoadingChamberCasing(aX, aY, aZ + 1)) && (isLoadingChamberCasing(aX, aY, aZ - 1))
-    			&& (isLoadingChamberCasing(aX, aY + 1, aZ)) && (isLoadingChamberCasing(aX, aY - 1, aZ));
+    //Check core chamber
+    private boolean checkCoreChamber(int aX, int aY, int aZ) {
+    	return (isCoreChamberCasing(aX + 1, aY, aZ)) && (isCoreChamberCasing(aX - 1, aY, aZ)) 
+    			&& (isCoreChamberCasing(aX, aY, aZ + 1)) && (isCoreChamberCasing(aX, aY, aZ - 1))
+    			&& (isCoreChamberCasing(aX, aY + 1, aZ)) && (isCoreChamberCasing(aX, aY - 1, aZ));
     }
     
     //Check intermix chamber
@@ -379,7 +378,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     			&&(isIntermixChamberCasing(aX, aY - 2, aZ)) && (isIntermixChamberCasing(aX, aY - 2, aZ + 1)) && (isIntermixChamberCasing(aX, aY - 2, aZ - 1));
     }
 
-    //Check Dynamo Hatch and Casing on his side
+    //Check and add Dynamo Hatch, and Casing on his side
     private boolean addIfEnergyExtractor(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
     	
     	if(xDir == 1 || xDir == -1) {
@@ -390,6 +389,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         		&& isAdvancedMachineCasing(aX - 1, aY, aZ) && isAdvancedMachineCasing(aX + 1, aY, aZ);
     }
     
+    //Check and add Fluid IO Hatch for Intermix chamber
     private boolean addIfFluidIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
     	
     	if (xDir == 1 || xDir == -1) {
@@ -404,6 +404,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
 				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31))));
     }
     
+    //Check and add Item IO Bus for Antimatter and UU cell
     private boolean addIfItemIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
     	
     	IMetaTileEntity aMetaTileEntity1 = aTileEntity.getIGregTechTileEntity(aX - zDir, aY, aZ - xDir).getMetaTileEntity();
@@ -430,7 +431,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 7);
     }
     
-  //Check needed Core coil
+  //Check needed Magnetic Coil
     private boolean isMagneticCoil(int aX, int aY, int aZ) {
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings5) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 6);
     }
@@ -440,92 +441,26 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 6);
     }
     
-    //Check needed Core coil
-    private boolean isLoadingChamberCasing(int aX, int aY, int aZ) {
+    //Check needed Core Chamber Casing
+    private boolean isCoreChamberCasing(int aX, int aY, int aZ) {
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings3) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 10);
     }
     
-    //Check Core Block
+    //Check Intermix Chamber Casing
     private boolean isIntermixChamberCasing(int aX, int aY, int aZ) {
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings2) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 15);
     }
     
-    @Override
-    public void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick) {
-    	if (aBaseMetaTileEntity.isServerSide()) {
-            if (mEfficiency < 0) mEfficiency = 0;
-            /*if (mRunningOnLoad && checkMachine(aBaseMetaTileEntity, mInventory[1])) {
-                checkRecipe(mInventory[1]);
-                this.mColant = this.mLastRecipe.mFluidInputs[0];
-            }*/
-            if (--mUpdate == 0 || --mStartUpCheck == 0) {
-                mInputHatches.clear();
-                mInputBusses.clear();
-                mOutputHatches.clear();
-                mOutputBusses.clear();
-                mDynamoHatches.clear();
-                mEnergyHatches.clear();
-                mMufflerHatches.clear();
-                mMaintenanceHatches.clear();
-                mMachine = checkMachine(aBaseMetaTileEntity, mInventory[1]);
-            }
-            if (mStartUpCheck < 0) {
-                if (mMachine) {
-                	/*if (depleteInput(mColant) && mMaxProgresstime > 0) {
-                        stopMachine();
-                    }*/
-                    if (getRepairStatus() > 0) {
-                        if (mMaxProgresstime > 0 && doRandomMaintenanceDamage()) {
-                        	if (onRunningTick(mInventory[1])) {
-                        		if (mMaxProgresstime > 0 && ++mProgresstime >= mMaxProgresstime) {
-                                	if (mOutputItems != null)
-                                    	for (ItemStack tStack : mOutputItems) if (tStack != null) addOutput(tStack);
-                                	if (mOutputFluids != null)
-                                    	for (FluidStack tStack : mOutputFluids) if (tStack != null) addOutput(tStack);
-                                	mEfficiency = Math.max(0, Math.min(mEfficiency + mEfficiencyIncrease, getMaxEfficiency(mInventory[1]) - ((getIdealStatus() - getRepairStatus()) * 1000)));
-                                	mOutputItems = null;
-                                	mProgresstime = 0;
-                                	mMaxProgresstime = 0;
-                                	mEfficiencyIncrease = 0;
-                                	//this.mColant = this.mLastRecipe.mFluidInputs[0];
-                                	if (aBaseMetaTileEntity.isAllowedToWork())
-                                    	checkRecipe(mInventory[1]);
-                            	}
-                        	}
-                        } else {
-                            if (aTick % 100 == 0 || aBaseMetaTileEntity.hasWorkJustBeenEnabled() || aBaseMetaTileEntity.hasInventoryBeenModified()) {
-                                //turnCasingActive(mMaxProgresstime > 0);
-                                if (aBaseMetaTileEntity.isAllowedToWork()) {
-                                    checkRecipe(mInventory[1]);
-                                    this.mColant = this.mLastRecipe.mFluidInputs[0];
-                                    this.mColant.amount = 1;
-                                }
-                                if (mMaxProgresstime <= 0)
-                                    mEfficiency = Math.max(0, mEfficiency - 1000);
-                            }
-                        }
-                    } else {
-                        this.mLastRecipe = null;
-                        stopMachine();
-                    }
-                } else {
-                    //turnCasingActive(false);
-                    this.mLastRecipe = null;
-                    stopMachine();
-                }
-            }
-    	}
-    }
-    
+    //Called every tick. If no colant plasma - reacting stop
     @Override
     public boolean onRunningTick(ItemStack aStack) {
     	if (mEUt > 0) {
-            if (depleteInput(mColant)) {
+            if (depleteInput(mInputColant)) {
         		addEnergyOutput(((long) mEUt * mEfficiency) / 10000);
+        		addOutput(mOutputColant);
         		return true;  
             }
         }
-    	this.mLastRecipe = null;
         stopMachine();
         return false;
     }
@@ -561,7 +496,6 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         super.loadNBTData(aNBT);
     }
     
-    //Zagraznenie. Not Use
     @Override
     public int getPollutionPerTick(ItemStack aStack) {
         return 0;
@@ -577,7 +511,8 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return new String[]{
             "Antimatter Reactor",
             "Current Output: "+mEUt+" EU/t",
-            "Current Efficiency: "+(mEfficiency/100)+"%"};
+            "Current Efficiency: "+(mEfficiency/100)+"%",
+            "Remaining reacting time: "+(mMaxProgresstime - mProgresstime)+" sec"};
     }
     
     @Override
