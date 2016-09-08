@@ -87,9 +87,9 @@ public class GT_Block_Casings4
             case 13:
                 return Textures.BlockIcons.MACHINE_CASING_ENGINE_INTAKE.getIcon();
             case 14:
-            	return Textures.BlockIcons.MACHINE_CASING_FUSION_COIL.getIcon();
+            	return Textures.BlockIcons.MACHINE_CASING_DYSON_RING.getIcon();
             case 15:
-            	return Textures.BlockIcons.MACHINE_CASING_GRATE.getIcon();
+            	return Textures.BlockIcons.MACHINE_CASING_CORE_CHAMBER.getIcon();
         }
         return Textures.BlockIcons.MACHINE_CASING_SOLID_STEEL.getIcon();
     }

@@ -55,9 +55,9 @@ public class GT_Block_Casings5
             case 6:
                 return Textures.BlockIcons.MACHINE_COIL_NAQUADAHALLOY.getIcon();
             case 7:
-                return Textures.BlockIcons.MACHINE_COIL_NAQUADAHALLOY.getIcon();
+                return Textures.BlockIcons.MACHINE_COIL_MAGNETIC.getIcon();
             case 8:
-            	return Textures.BlockIcons.MACHINE_CASING_PIPE_TUNGSTENSTEEL.getIcon();
+            	return Textures.BlockIcons.MACHINE_INTERMIX_CHAMBER.getIcon();
         }
         return Textures.BlockIcons.MACHINE_COIL_CUPRONICKEL.getIcon();
     }
