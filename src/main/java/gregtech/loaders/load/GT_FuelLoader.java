@@ -27,7 +27,7 @@ public class GT_FuelLoader
         GT_Recipe.GT_Recipe_Map.sLargeNaquadahReactorFuels.addRecipe(true, new ItemStack[]{GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.NaquadahEnriched, 1L)}, new ItemStack[]{GT_OreDictUnificator.get(OrePrefixes.ingot, Materials.Naquadah, 1L)}, null, null, null, 0, 0, 200000);
         GT_Recipe.GT_Recipe_Map.sFluidNaquadahReactorFuels.addRecipe(true, new ItemStack[]{GT_OreDictUnificator.get(OrePrefixes.cell, Materials.NaquadahEnriched, 1L)}, new ItemStack[]{GT_OreDictUnificator.get(OrePrefixes.cell,  Materials.Naquadah, 1L)}, null, null, null, 0, 0, 200000);
 
-        GT_Recipe.GT_Recipe_Map.sAntimatterReactorFuels.addRecipe(true, new ItemStack[]{GT_OreDictUnificator.get(OrePrefixes.cell, Materials.Antimatter, 1L), GT_OreDictUnificator.get(OrePrefixes.cell, Materials.UUMatter, 1L)},  new ItemStack[]{ItemList.Cell_Empty.get(2L, new Object[0])}, null, new FluidStack[]{Materials.Nickel.getMolten(16)}, new FluidStack[]{Materials.Nickel.getPlasma(16)}, 0, 0, 14400);
+        GT_Recipe.GT_Recipe_Map.sAntimatterReactorFuels.addRecipe(true, new ItemStack[]{ItemList.Magnetic_Confinement_Pod_Antimatter.get(1L, new Object[0]), ItemList.Magnetic_Confinement_Pod_UUMatter.get(1L, new Object[0])},  new ItemStack[]{ItemList.Magnetic_Confinement_Pod.get(2L, new Object[0])}, null, new FluidStack[]{Materials.Nickel.getMolten(1)}, new FluidStack[]{Materials.Nickel.getPlasma(1)}, 0, 0, 7200);
         
         GT_Values.RA.addFuel(GT_ModHandler.getModItem("Thaumcraft", "ItemResource", 1L, 4), null, 4, 5);
         GT_Values.RA.addFuel(new ItemStack(Items.experience_bottle, 1), null, 10, 5);

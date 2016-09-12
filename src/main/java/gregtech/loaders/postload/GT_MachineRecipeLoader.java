@@ -192,6 +192,8 @@ if(Loader.isModLoaded("Railcraft")){
         GT_Values.RA.addFluidCannerRecipe(ItemList.Battery_Hull_HV.get(1L, new Object[0]), ItemList.Battery_SU_HV_SulfuricAcid.getWithCharge(1L, Integer.MAX_VALUE, new Object[0]), Materials.SulfuricAcid.getFluid(16000L), GT_Values.NF);
         GT_Values.RA.addFluidCannerRecipe(ItemList.TF_Vial_FieryTears.get(1L, new Object[0]), ItemList.Bottle_Empty.get(1L, new Object[0]), GT_Values.NF, Materials.FierySteel.getFluid(250L));
 
+        GT_Values.RA.addFluidCannerRecipe(ItemList.Magnetic_Confinement_Pod.get(1L, new Object[0]), ItemList.Magnetic_Confinement_Pod_UUMatter.get(1L, new Object[0]), Materials.UUMatter.getFluid(1000L), GT_Values.NF);
+        
         Materials tMaterial = Materials.Iron;
         if (tMaterial.mStandardMoltenFluid != null) {
             GT_Values.RA.addFluidSolidifierRecipe(ItemList.Shape_Mold_Casing.get(0L, new Object[0]), tMaterial.getMolten(72L), ItemList.IC2_Item_Casing_Iron.get(1L, new Object[0]), 16, 8);

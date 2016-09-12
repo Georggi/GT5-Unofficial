@@ -782,6 +782,10 @@ public class GT_MetaGenerated_Item_01
         GT_Values.RA.addAssemblerRecipe(ItemList.Electric_Pump_EV.get(1L, new Object[0]), GT_OreDictUnificator.get(OrePrefixes.circuit, Materials.Elite, 2), 	ItemList.FluidRegulator_EV.get(1L, new Object[0]), 800, 32);
         GT_Values.RA.addAssemblerRecipe(ItemList.Electric_Pump_IV.get(1L, new Object[0]), GT_OreDictUnificator.get(OrePrefixes.circuit, Materials.Master, 2), 	ItemList.FluidRegulator_IV.get(1L, new Object[0]), 800, 64);
 
+        ItemList.Magnetic_Confinement_Pod.set(addItem(tLastID = 580, "Magnetic Confinement Pod", "For contains very dangerous material in antigravitation field!", new Object[0]));
+        ItemList.Magnetic_Confinement_Pod_Antimatter.set(addItem(tLastID = 581, "Antimatter Pod", "The absolute opposite of everything - in a cage!", new Object[0]));
+        ItemList.Magnetic_Confinement_Pod_UUMatter.set(addItem(tLastID = 582, "UUMatter Pod", "Primal Matter in a cage!", new Object[0]));
+        
     }
 
     public boolean onEntityItemUpdate(EntityItem aItemEntity) {

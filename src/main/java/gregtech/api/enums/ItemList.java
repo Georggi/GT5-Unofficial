@@ -616,7 +616,9 @@ public enum ItemList implements IItemContainer {
     Reactor_Coolant_He_1, Reactor_Coolant_He_3, Reactor_Coolant_He_6, Reactor_Coolant_NaK_1, Reactor_Coolant_NaK_3, Reactor_Coolant_NaK_6,
     ThoriumCell_1, ThoriumCell_2, ThoriumCell_4,
     FusionComputer_LuV, FusionComputer_ZPMV, FusionComputer_UV,
-    Generator_Antimatter_Reactor,
+    
+    Generator_Antimatter_Reactor, Magnetic_Confinement_Pod, Magnetic_Confinement_Pod_Antimatter, Magnetic_Confinement_Pod_UUMatter,
+    
     Casing_Fusion_Coil, Casing_Fusion, Casing_Fusion2,
     Generator_Plasma_IV, Generator_Plasma_LuV, Generator_Plasma_ZPMV,
     MagicEnergyConverter_LV, MagicEnergyConverter_MV, MagicEnergyConverter_HV,
