@@ -22,7 +22,7 @@ import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_MultiBlockB
 import gregtech.api.objects.GT_RenderedTexture;
 import gregtech.api.util.GT_Recipe;
 import gregtech.api.util.GT_Utility;
-import gregtech.common.gui.GT_GUIContainer_FusionReactor;
+import gregtech.common.gui.GT_GUIContainer_AntimatterReactor;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -88,7 +88,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
 
     @Override
     public Object getClientGUI(int aID, InventoryPlayer aPlayerInventory, IGregTechTileEntity aBaseMetaTileEntity) {
-        return new GT_GUIContainer_FusionReactor(aPlayerInventory, aBaseMetaTileEntity, getLocalName(), "FusionComputer.png", GT_Recipe.GT_Recipe_Map.sFusionRecipes.mNEIName);
+        return new GT_GUIContainer_AntimatterReactor(aPlayerInventory, aBaseMetaTileEntity, getLocalName(), "AntimatterReactor.png", GT_Recipe.GT_Recipe_Map.sAntimatterReactorFuels.mNEIName);
     }
     
      @Override
@@ -131,12 +131,11 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
              }
              if (tRecipe.isRecipeInputEqual(true, tFluids, tInputs)) {
                  this.mEUt = 524288;
-                 this.mMaxProgresstime = tRecipe.mSpecialValue;
+                 this.mMaxProgresstime = tRecipe.mSpecialValue * 20;
                  this.mEfficiency = 10000;
                  this.mEfficiencyIncrease = 10000;
                  this.mInputColant = tRecipe.mFluidInputs[0];
                  this.mOutputColant = tRecipe.mFluidOutputs[0];
-                 this.mOutputFluids = tRecipe.mFluidOutputs;
                  this.mOutputItems = tRecipe.mOutputs;
                  //turnCasingActive(true);
                  updateSlots();
@@ -404,7 +403,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
 				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 72))));
     }
     
-    //Check and add Item IO Bus for Antimatter and UU cell
+    //Check and add Item IO Bus for fuel
     private boolean addIfItemIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
     	
     	IMetaTileEntity aMetaTileEntity1 = aTileEntity.getIGregTechTileEntity(aX - zDir, aY, aZ - xDir).getMetaTileEntity();
@@ -509,10 +508,11 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     //CHANGE!!! Info for netCard? @.@
     public String[] getInfoData() {
         return new String[]{
-            "Antimatter Reactor",
+            "Antimatter Reactor MKI",
             "Current Output: "+mEUt+" EU/t",
             "Current Efficiency: "+(mEfficiency/100)+"%",
-            "Remaining reacting time: "+(mMaxProgresstime - mProgresstime)+" sec"};
+            "Reacting time: "+(mMaxProgresstime/20)+" sec",
+            "Remaining reacting time: "+((mMaxProgresstime - mProgresstime)/20)+" sec"};
     }
     
     @Override
