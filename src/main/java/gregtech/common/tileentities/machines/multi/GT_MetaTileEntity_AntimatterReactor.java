@@ -393,15 +393,15 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     private boolean addIfFluidIO(int aX, int aY, int aZ, IGregTechTileEntity aTileEntity) {
     	
     	if (xDir == 1 || xDir == -1) {
-    		return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 31))
-    				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 31)))
-    				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 31))
-    				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 31))));
+    		return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 72))
+    				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 72)))
+    				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ + 1), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY + 2, aZ - 1), 72))
+    				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ + 1), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX, aY - 2, aZ - 1), 72))));
     	}
-        return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 31))
-				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)))
-				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 31))
-				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 31)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 31))));
+        return ((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 72))
+				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 72)))
+				|| (((addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY + 2, aZ), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY + 2, aZ), 72))
+				&& (addInputToMachineList(aTileEntity.getIGregTechTileEntity(aX + 1, aY - 2, aZ), 72)) && (addOutputToMachineList(aTileEntity.getIGregTechTileEntity(aX - 1, aY - 2, aZ), 72))));
     }
     
     //Check and add Item IO Bus for Antimatter and UU cell
@@ -428,27 +428,27 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     
   //Check needed Kinetic Coil
     private boolean isKineticCoil(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 7);
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 14);
     }
     
   //Check needed Magnetic Coil
     private boolean isMagneticCoil(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings5) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 6);
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings5) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 7);
     }
     
     //Check needed Core Casing
     private boolean isCoreMachineCasing(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 6);
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 8);
     }
     
     //Check needed Core Chamber Casing
     private boolean isCoreChamberCasing(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings3) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 10);
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings4) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 15);
     }
     
     //Check Intermix Chamber Casing
     private boolean isIntermixChamberCasing(int aX, int aY, int aZ) {
-        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings2) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 15);
+        return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings5) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 8);
     }
     
     //Called every tick. If no colant plasma - reacting stop
