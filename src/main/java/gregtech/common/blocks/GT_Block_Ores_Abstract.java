@@ -37,6 +37,8 @@ public abstract class GT_Block_Ores_Abstract extends GT_Generic_Block implements
     public static boolean FUCKING_LOCK = false;
     public static boolean tHideOres;
     public static int tOreMetaCount;
+    private final String aTextName = ".name";
+    private final String aTextSmall = "Small ";
 
     protected GT_Block_Ores_Abstract(String aUnlocalizedName, int aOreMetaCount, boolean aHideFirstMeta, Material aMaterial) {
         super(GT_Item_Ores.class, aUnlocalizedName, aMaterial);
@@ -53,18 +55,23 @@ public abstract class GT_Block_Ores_Abstract extends GT_Generic_Block implements
         for (int i = 1; i < GregTech_API.sGeneratedMaterials.length; i++) {
             if (GregTech_API.sGeneratedMaterials[i] != null) {
                 for (int j = 0; j < aOreMetaCount; j++) {
-                    GT_LanguageManager.addStringLocalization(getUnlocalizedName() + "." + (i + (j * 1000)) + ".name", getLocalizedName(GregTech_API.sGeneratedMaterials[i]));
-                    GT_LanguageManager.addStringLocalization(getUnlocalizedName() + "." + ((i + 16000) + (j * 1000)) + ".name", "Small " + getLocalizedName(GregTech_API.sGeneratedMaterials[i]));
+                    GT_LanguageManager.addStringLocalization(getUnlocalizedName() + "." + (i + (j * 1000)) + aTextName, getLocalizedName(GregTech_API.sGeneratedMaterials[i]));
+                    GT_LanguageManager.addStringLocalization(getUnlocalizedName() + "." + ((i + 16000) + (j * 1000)) + aTextName, aTextSmall + getLocalizedName(GregTech_API.sGeneratedMaterials[i]));
                     if ((GregTech_API.sGeneratedMaterials[i].mTypes & 0x8) != 0) {
                         GT_OreDictUnificator.registerOre(this.getProcessingPrefix()[j] != null ? this.getProcessingPrefix()[j].get(GregTech_API.sGeneratedMaterials[i]) : "", new ItemStack(this, 1, i + (j * 1000)));
                         if (tHideOres) {
-                            codechicken.nei.api.API.hideItem(new ItemStack(this, 1, (j == 0 && aHideFirstMeta) ? i : i + (j * 1000)));
+                            if(!(j == 0 && !aHideFirstMeta)){
+                                codechicken.nei.api.API.hideItem(new ItemStack(this, 1, i + (j * 1000)));}
                             codechicken.nei.api.API.hideItem(new ItemStack(this, 1, (i + 16000) + (j * 1000)));
                         }
                     }
                 }
             }
         }
+    }
+
+    public int getBaseBlockHarvestLevel(int aMeta) {
+        return 0;
     }
 
     public void onNeighborChange(IBlockAccess aWorld, int aX, int aY, int aZ, int aTileX, int aTileY, int aTileZ) {
@@ -90,28 +97,28 @@ public abstract class GT_Block_Ores_Abstract extends GT_Generic_Block implements
     }
 
     public String getLocalizedName(Materials aMaterial) {
-        switch (aMaterial) {
-            case InfusedAir:
-            case InfusedDull:
-            case InfusedEarth:
-            case InfusedEntropy:
-            case InfusedFire:
-            case InfusedOrder:
-            case InfusedVis:
-            case InfusedWater:
+        switch (aMaterial.mName) {
+            case "InfusedAir":
+            case "InfusedDull":
+            case "InfusedEarth":
+            case "InfusedEntropy":
+            case "InfusedFire":
+            case "InfusedOrder":
+            case "InfusedVis":
+            case "InfusedWater":
                 return aMaterial.mDefaultLocalName + " Infused Stone";
-            case Vermiculite:
-            case Bentonite:
-            case Kaolinite:
-            case Talc:
-            case BasalticMineralSand:
-            case GraniticMineralSand:
-            case GlauconiteSand:
-            case CassiteriteSand:
-            case GarnetSand:
-            case QuartzSand:
-            case Pitchblende:
-            case FullersEarth:
+            case "Vermiculite":
+            case "Bentonite":
+            case "Kaolinite":
+            case "Talc":
+            case "BasalticMineralSand":
+            case "GraniticMineralSand":
+            case "GlauconiteSand":
+            case "CassiteriteSand":
+            case "GarnetSand":
+            case "QuartzSand":
+            case "Pitchblende":
+            case "FullersEarth":
                 return aMaterial.mDefaultLocalName;
             default:
                 return aMaterial.mDefaultLocalName + OrePrefixes.ore.mLocalizedMaterialPost;
@@ -151,7 +158,7 @@ public abstract class GT_Block_Ores_Abstract extends GT_Generic_Block implements
     public abstract String getUnlocalizedName();
 
     public String getLocalizedName() {
-        return StatCollector.translateToLocal(getUnlocalizedName() + ".name");
+        return StatCollector.translateToLocal(getUnlocalizedName() + aTextName);
     }
 
     public int getRenderType() {
@@ -199,7 +206,7 @@ public abstract class GT_Block_Ores_Abstract extends GT_Generic_Block implements
 
     public int getDamageValue(World aWorld, int aX, int aY, int aZ) {
         TileEntity tTileEntity = aWorld.getTileEntity(aX, aY, aZ);
-        if ((tTileEntity != null) && ((tTileEntity instanceof GT_TileEntity_Ores))) {
+        if (((tTileEntity instanceof GT_TileEntity_Ores))) {
             return ((GT_TileEntity_Ores) tTileEntity).getMetaData();
         }
         return 0;
@@ -239,22 +246,22 @@ public abstract class GT_Block_Ores_Abstract extends GT_Generic_Block implements
         for (int i = 0; i < GregTech_API.sGeneratedMaterials.length; i++) {
             Materials tMaterial = GregTech_API.sGeneratedMaterials[i];
             if ((tMaterial != null) && ((tMaterial.mTypes & 0x8) != 0)) {
-                if (!(new ItemStack(aItem, 1, i).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i));
-                if (!(new ItemStack(aItem, 1, i + 1000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 1000));
-                if (!(new ItemStack(aItem, 1, i + 2000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 2000));
-                if (!(new ItemStack(aItem, 1, i + 3000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 3000));
-                if (!(new ItemStack(aItem, 1, i + 4000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 4000));
-                if (!(new ItemStack(aItem, 1, i + 5000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 5000));
-                if (!(new ItemStack(aItem, 1, i + 6000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 6000));
-                if (!(new ItemStack(aItem, 1, i + 7000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 7000));
-                if (!(new ItemStack(aItem, 1, i + 16000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 16000));
-                if (!(new ItemStack(aItem, 1, i + 17000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 17000));
-                if (!(new ItemStack(aItem, 1, i + 18000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 18000));
-                if (!(new ItemStack(aItem, 1, i + 19000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 19000));
-                if (!(new ItemStack(aItem, 1, i + 20000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 20000));
-                if (!(new ItemStack(aItem, 1, i + 21000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 21000));
-                if (!(new ItemStack(aItem, 1, i + 22000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 22000));
-                if (!(new ItemStack(aItem, 1, i + 23000).getDisplayName().contains(".name"))) aList.add(new ItemStack(aItem, 1, i + 23000));
+                if (!(new ItemStack(aItem, 1, i).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i));
+                if (!(new ItemStack(aItem, 1, i + 1000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 1000));
+                if (!(new ItemStack(aItem, 1, i + 2000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 2000));
+                if (!(new ItemStack(aItem, 1, i + 3000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 3000));
+                if (!(new ItemStack(aItem, 1, i + 4000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 4000));
+                if (!(new ItemStack(aItem, 1, i + 5000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 5000));
+                if (!(new ItemStack(aItem, 1, i + 6000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 6000));
+                if (!(new ItemStack(aItem, 1, i + 7000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 7000));
+                if (!(new ItemStack(aItem, 1, i + 16000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 16000));
+                if (!(new ItemStack(aItem, 1, i + 17000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 17000));
+                if (!(new ItemStack(aItem, 1, i + 18000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 18000));
+                if (!(new ItemStack(aItem, 1, i + 19000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 19000));
+                if (!(new ItemStack(aItem, 1, i + 20000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 20000));
+                if (!(new ItemStack(aItem, 1, i + 21000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 21000));
+                if (!(new ItemStack(aItem, 1, i + 22000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 22000));
+                if (!(new ItemStack(aItem, 1, i + 23000).getDisplayName().contains(aTextName))) aList.add(new ItemStack(aItem, 1, i + 23000));
             }
         }
     }

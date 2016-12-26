@@ -13,13 +13,16 @@ import gregtech.api.objects.MaterialStack;
 import gregtech.api.util.GT_LanguageManager;
 import gregtech.api.util.GT_ModHandler;
 import gregtech.api.util.GT_OreDictUnificator;
+import ic2.core.block.EntityIC2Explosive;
+import ic2.core.block.EntityItnt;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.boss.EntityWither;
+import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -30,9 +33,6 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import ic2.core.IC2;
-import ic2.core.block.EntityIC2Explosive;
-import ic2.core.block.EntityItnt;
 
 import java.util.List;
 import java.util.Random;
@@ -211,11 +211,7 @@ public class GT_Block_Reinforced extends GT_Generic_Block {
     public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z)
     {
       if(world.getBlockMetadata(x, y, z)==5){
-        EntityIC2Explosive entitytntprimed = getExplosionEntity(world, x, y, z, player == null ? null : player);
-        if (entitytntprimed == null) {
-          return false;
-        }
-        
+    	EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, x, y, z, player == null ? null : player);
         world.spawnEntityInWorld(entitytntprimed);
         world.playSoundAtEntity(entitytntprimed, "random.fuse", 1.0F, 1.0F);
         
@@ -223,15 +219,6 @@ public class GT_Block_Reinforced extends GT_Generic_Block {
       return false;
       }
       return super.removedByPlayer(world, player, x, y, z);
-    }
-    
-    public EntityIC2Explosive getExplosionEntity(World world, int x, int y, int z, EntityLivingBase igniter)
-    {
-      EntityIC2Explosive ret;
-      ret = new EntityItnt(world, x + 0.5D, y + 0.5D, z + 0.5D);
-      ret.setIgniter(igniter);
-      
-      return ret;
     }
     
     public void onBlockAdded(World world, int x, int y, int z)
@@ -251,19 +238,16 @@ public class GT_Block_Reinforced extends GT_Generic_Block {
     
     public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion)
     {
-      EntityIC2Explosive entitytntprimed = getExplosionEntity(world, x, y, z, explosion == null ? null : explosion.getExplosivePlacedBy());
-      if (entitytntprimed == null) {
-        return;
-      }
+    	if(!world.isRemote && world.getBlockMetadata(x, y, z)==5){
+    	EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, x, y, z, explosion.getExplosivePlacedBy());
       entitytntprimed.fuse = (world.rand.nextInt(entitytntprimed.fuse / 4) + entitytntprimed.fuse / 8);
-      world.spawnEntityInWorld(entitytntprimed);
+      world.spawnEntityInWorld(entitytntprimed);}
     }
     
     public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer player, int side, float xOffset, float yOffset, float zOffset)
     {
       if ((player.getCurrentEquippedItem() != null) && (player.getCurrentEquippedItem().getItem() == Items.flint_and_steel)&&par1World.getBlockMetadata(x, y, z)==5)
       {
-//        par1World.setBlockMetadataWithNotify(x, y, z, 6, 7);
         removedByPlayer(par1World, player, x, y, z);
         
         return true;
@@ -278,7 +262,12 @@ public class GT_Block_Reinforced extends GT_Generic_Block {
     @SideOnly(Side.CLIENT)
     public void getSubBlocks(Item aItem, CreativeTabs par2CreativeTabs, List aList) {
         for (int i = 0; i < 16; i++) {
-            aList.add(new ItemStack(aItem, 1, i));
+            ItemStack aStack = new ItemStack(aItem, 1, i);
+            if (!aStack.getDisplayName().contains(".name")) aList.add(aStack);
         }
+    }
+    
+    public boolean canEntityDestroy(IBlockAccess world, int x, int y, int z, Entity entity) {
+        return !(entity instanceof EntityWither);
     }
 }
