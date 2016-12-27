@@ -34,6 +34,7 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
     public int mPollution = 0, mProgresstime = 0, mMaxProgresstime = 0, mEUt = 0, mEfficiencyIncrease = 0, mUpdate = 0, mStartUpCheck = 100, mRuntime = 0, mEfficiency = 0;
     public ItemStack[] mOutputItems = null;
     public FluidStack[] mOutputFluids = null;
+    public FluidStack[] mInputFluids = null;
     public String mNEI;
     public int damageFactorLow = 5;
     public float damageFactorHigh = 0.6f;
@@ -128,6 +129,12 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
                 mOutputFluids[i].writeToNBT(tNBT);
                 aNBT.setTag("mOutputFluids" + i, tNBT);
             }
+        if (mInputFluids != null) for (int i = 0; i < mInputFluids.length; i++)
+            if (mInputFluids[i] != null) {
+                NBTTagCompound tNBT = new NBTTagCompound();
+                mInputFluids[i].writeToNBT(tNBT);
+                aNBT.setTag("mInputFluids" + i, tNBT);
+            }
         aNBT.setBoolean("mWrench", mWrench);
         aNBT.setBoolean("mScrewdriver", mScrewdriver);
         aNBT.setBoolean("mSoftHammer", mSoftHammer);
@@ -151,6 +158,9 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
         mOutputFluids = new FluidStack[getAmountOfOutputs()];
         for (int i = 0; i < mOutputFluids.length; i++)
             mOutputFluids[i] = GT_Utility.loadFluid(aNBT, "mOutputFluids" + i);
+        mInputFluids = new FluidStack[getAmountOfOutputs()];
+        for (int i = 0; i < mInputFluids.length; i++)
+        	mInputFluids[i] = GT_Utility.loadFluid(aNBT, "mInputFluids" + i);
         mWrench = aNBT.getBoolean("mWrench");
         mScrewdriver = aNBT.getBoolean("mScrewdriver");
         mSoftHammer = aNBT.getBoolean("mSoftHammer");

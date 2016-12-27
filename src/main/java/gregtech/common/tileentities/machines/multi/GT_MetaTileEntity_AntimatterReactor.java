@@ -49,16 +49,18 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     
     public String[] getDescription() {
         return new String[]{
-                "Controller Block for the Antimatter Reactor",
-                "Size(WxHxD): 7x7x7 (Sphere)",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah",
-                "Blah-Blah-Blah"};
+                "REBIRTH IN A NEW ERA!!!",
+                "Size(WxHxD): 15x15x15 (Almost Chunk)",
+                "108 x Magnetic Coil Block",
+                "86 x Radiation Proof Casing",
+                "60 x Dyson Ring Casing",
+                "40 x Fusion Casing MKII",
+                "6 x Core Chamber Casing",
+                "6 x Intermix Chamber Casing",
+                "2/2 x Input/Output Hatch (All UV)",
+                "1/1 x Input/Output Bus (All UV)",
+                "1 x Dynamo Hatch (UV)",
+                "524288 EU/t and 1 L/t plasma (in cooling)"};
     }
     
     //Set textures for main block
@@ -125,18 +127,19 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
          
          if (tInputList.size() > 1) {
              GT_Recipe tRecipe = GT_Recipe.GT_Recipe_Map_Fuel.sAntimatterReactorFuels.findRecipe(getBaseMetaTileEntity(), false, Long.MAX_VALUE, tFluids, tInputs);
-             if (tRecipe == null) {
+             if (tRecipe == null && !mRunningOnLoad) {
                  //turnCasingActive(false);
                  return false;
              }
-             if (tRecipe.isRecipeInputEqual(true, tFluids, tInputs)) {
+             if (mRunningOnLoad || tRecipe.isRecipeInputEqual(true, tFluids, tInputs)) {
                  this.mEUt = 524288;
                  this.mMaxProgresstime = tRecipe.mSpecialValue * 20;
                  this.mEfficiency = 10000;
                  this.mEfficiencyIncrease = 10000;
-                 this.mInputColant = tRecipe.mFluidInputs[0];
-                 this.mOutputColant = tRecipe.mFluidOutputs[0];
+                 this.mInputFluids = tRecipe.mFluidInputs;
+                 this.mOutputFluids = tRecipe.mFluidOutputs;
                  this.mOutputItems = tRecipe.mOutputs;
+                 mRunningOnLoad = false;
                  //turnCasingActive(true);
                  updateSlots();
                  return true;
@@ -450,13 +453,75 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return (getBaseMetaTileEntity().getBlock(aX, aY, aZ) == GregTech_API.sBlockCasings5) && (getBaseMetaTileEntity().getMetaID(aX, aY, aZ) == 8);
     }
     
+    @Override
+    public void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick) {
+        if (aBaseMetaTileEntity.isServerSide()) {
+            if (mEfficiency < 0) mEfficiency = 0;
+            if (mRunningOnLoad && checkMachine(aBaseMetaTileEntity, mInventory[1])) {
+                checkRecipe(mInventory[1]);
+            }
+            if (--mUpdate == 0 || --mStartUpCheck == 0) {
+                mInputHatches.clear();
+                mInputBusses.clear();
+                mOutputHatches.clear();
+                mOutputBusses.clear();
+                mDynamoHatches.clear();
+                mEnergyHatches.clear();
+                mMufflerHatches.clear();
+                mMaintenanceHatches.clear();
+                mMachine = checkMachine(aBaseMetaTileEntity, mInventory[1]);
+            }
+            if (mStartUpCheck < 0) {
+                if (mMachine) {
+                	if (this.mInputFluids == null && mMaxProgresstime > 0) {
+                        stopMachine();
+                    }
+                    if (getRepairStatus() > 0) {
+                        if (mMaxProgresstime > 0 && doRandomMaintenanceDamage()) {
+							if (onRunningTick(mInventory[1])) {
+								if (mMaxProgresstime > 0 && ++mProgresstime >= mMaxProgresstime) {
+									if (mOutputItems != null) 
+										for (ItemStack tStack : mOutputItems) if (tStack != null) addOutput(tStack);
+									if (mInputFluids != null) 
+										for (FluidStack tStack : mInputFluids) if (tStack != null) depleteInput(tStack);
+									if (mOutputFluids != null) 
+										for (FluidStack tStack : mOutputFluids) if (tStack != null) addOutput(tStack);
+									mEfficiency = Math.max(0, Math.min(mEfficiency + mEfficiencyIncrease, getMaxEfficiency(mInventory[1]) - ((getIdealStatus() - getRepairStatus()) * 1000)));
+									mProgresstime = 0;
+									mMaxProgresstime = 0;
+									mEfficiencyIncrease = 0;
+									if (aBaseMetaTileEntity.isAllowedToWork()) checkRecipe(mInventory[1]);
+								}
+							}
+                        } else {
+                            if (aTick % 100 == 0 || aBaseMetaTileEntity.hasWorkJustBeenEnabled() || aBaseMetaTileEntity.hasInventoryBeenModified()) {
+                                //turnCasingActive(mMaxProgresstime > 0);
+                                if (aBaseMetaTileEntity.isAllowedToWork()) {
+                                    checkRecipe(mInventory[1]);
+                                }
+                                if (mMaxProgresstime <= 0) mEfficiency = Math.max(0, mEfficiency - 1000);
+                            }
+                        }
+                    } else {
+                        stopMachine();
+                    }
+                } else {
+                    //turnCasingActive(false);
+                    stopMachine();
+                }
+            }
+            aBaseMetaTileEntity.setErrorDisplayID((aBaseMetaTileEntity.getErrorDisplayID() & ~127) | (mWrench ? 0 : 1) | (mScrewdriver ? 0 : 2) | (mSoftHammer ? 0 : 4) | (mHardHammer ? 0 : 8) | (mSolderingTool ? 0 : 16) | (mCrowbar ? 0 : 32) | (mMachine ? 0 : 64));
+            aBaseMetaTileEntity.setActive(mMaxProgresstime > 0);
+        }
+    }
+    
     //Called every tick. If no colant plasma - reacting stop
     @Override
     public boolean onRunningTick(ItemStack aStack) {
     	if (mEUt > 0) {
-            if (depleteInput(mInputColant)) {
+            if (depleteInput(mInputFluids[0])) {
         		addEnergyOutput(((long) mEUt * mEfficiency) / 10000);
-        		addOutput(mOutputColant);
+        		addOutput(mOutputFluids[0]);
         		return true;  
             }
         }
@@ -482,7 +547,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
     
     @Override
     public int getAmountOfOutputs() {
-        return 0;
+        return 1;
     }
     
     @Override
