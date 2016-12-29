@@ -33,7 +33,7 @@ public class GT_Block_Casings5
         ItemList.Casing_Coil_HSSG.set(new ItemStack(this, 1, 4));
         ItemList.Casing_Coil_Naquadah.set(new ItemStack(this, 1, 5));
         ItemList.Casing_Coil_NaquadahAlloy.set(new ItemStack(this, 1, 6));
-        ItemList.Casing_Coil_Magnetic.set(new ItemStack(this, 1, 7));
+        ItemList.Block_Magnetic_Coil.set(new ItemStack(this, 1, 7));
         ItemList.Casing_Internix_Chamber.set(new ItemStack(this, 1, 8));
     }
     @Override

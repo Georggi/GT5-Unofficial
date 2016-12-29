@@ -60,7 +60,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
                 "2/2 x Input/Output Hatch (All UV)",
                 "1/1 x Input/Output Bus (All UV)",
                 "1 x Dynamo Hatch (UV)",
-                "524288 EU/t and 1 L/t plasma (in cooling)"};
+                "524288 EU/t and 4 L/t plasma (in cooling)"};
     }
     
     //Set textures for main block
