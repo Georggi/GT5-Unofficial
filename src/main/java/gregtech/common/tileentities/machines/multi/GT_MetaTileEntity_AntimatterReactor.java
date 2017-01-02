@@ -37,7 +37,7 @@ import java.util.Collection;
 public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_MultiBlockBase {
 	
     protected int xDir = 0, zDir = 0;
-    public FluidStack mInputColant = null, mOutputColant = null;
+    protected int mColantConsumption = 0;
 	
     public GT_MetaTileEntity_AntimatterReactor(int aID, String aName, String aNameRegional, int tier) {
         super(aID, aName, aNameRegional);
@@ -139,6 +139,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
                  this.mInputFluids = tRecipe.mFluidInputs;
                  this.mOutputFluids = tRecipe.mFluidOutputs;
                  this.mOutputItems = tRecipe.mOutputs;
+                 this.mColantConsumption = tRecipe.mFluidInputs[0].amount;
                  mRunningOnLoad = false;
                  //turnCasingActive(true);
                  updateSlots();
@@ -575,7 +576,7 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return new String[]{
             "Antimatter Reactor MKI",
             "Current Output: "+mEUt+" EU/t",
-            "Current Efficiency: "+(mEfficiency/100)+"%",
+            "Current Colant Using: "+(mColantConsumption)+"L/t",
             "Reacting time: "+(mMaxProgresstime/20)+" sec",
             "Remaining reacting time: "+((mMaxProgresstime - mProgresstime)/20)+" sec"};
     }
