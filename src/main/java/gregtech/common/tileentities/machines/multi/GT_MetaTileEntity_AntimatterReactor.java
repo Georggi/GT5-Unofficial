@@ -546,10 +546,10 @@ public class GT_MetaTileEntity_AntimatterReactor extends GT_MetaTileEntity_Multi
         return 10000;
     }
     
-    @Override
+    /*@Override
     public int getAmountOfOutputs() {
         return 1;
-    }
+    }*/
     
     @Override
     public void saveNBTData(NBTTagCompound aNBT) {

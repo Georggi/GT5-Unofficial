@@ -174,9 +174,14 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
                 mOutputFluids[i] = GT_Utility.loadFluid(aNBT, "mOutputFluids" + i);
         }
         
-        mInputFluids = new FluidStack[getAmountOfOutputs()];
-        for (int i = 0; i < mInputFluids.length; i++)
-        	mInputFluids[i] = GT_Utility.loadFluid(aNBT, "mInputFluids" + i);
+        
+        int aInputFluidsLength = aNBT.getInteger("mOutputFluidsLength");
+        if (aInputFluidsLength > 0) {
+            mOutputFluids = new FluidStack[aInputFluidsLength];
+        //mInputFluids = new FluidStack[getAmountOfOutputs()];
+            for (int i = 0; i < mInputFluids.length; i++)
+            	mInputFluids[i] = GT_Utility.loadFluid(aNBT, "mInputFluids" + i);
+        }
         mWrench = aNBT.getBoolean("mWrench");
         mScrewdriver = aNBT.getBoolean("mScrewdriver");
         mSoftHammer = aNBT.getBoolean("mSoftHammer");

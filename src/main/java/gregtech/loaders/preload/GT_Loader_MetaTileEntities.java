@@ -1122,7 +1122,7 @@ public class GT_Loader_MetaTileEntities implements Runnable {
         ItemList.FusionComputer_ZPMV.set(new GT_MetaTileEntity_FusionComputer2(1194, "fusioncomputer.tier.07", "Fusion Control Computer Mark II").getStackForm(1L));
         ItemList.FusionComputer_UV.set(new GT_MetaTileEntity_FusionComputer3(1195, "fusioncomputer.tier.08", "Fusion Control Computer Mark III").getStackForm(1L));
 
-        ItemList.Antimatter_Reactor.set(new GT_MetaTileEntity_AntimatterReactor(1180, "basicgenerator.antimatter.tier.09", "Antimatter Reactor", 9).getStackForm(1L));
+        ItemList.Antimatter_Reactor.set(new GT_MetaTileEntity_AntimatterReactor(1175, "basicgenerator.antimatter.tier.09", "Antimatter Reactor", 9).getStackForm(1L));
         
         GT_ModHandler.addCraftingRecipe(ItemList.Casing_Fusion.get(1L, new Object[0]), GT_ModHandler.RecipeBits.DISMANTLEABLE | GT_ModHandler.RecipeBits.NOT_REMOVABLE | GT_ModHandler.RecipeBits.REVERSIBLE | GT_ModHandler.RecipeBits.BUFFERED, new Object[]{"PhP", "PFP", "PwP", Character.valueOf('P'), OrePrefixes.plate.get(Materials.TungstenSteel), Character.valueOf('F'), ItemList.Casing_LuV});
         GT_ModHandler.addCraftingRecipe(ItemList.Casing_Fusion2.get(1L, new Object[0]), GT_ModHandler.RecipeBits.DISMANTLEABLE | GT_ModHandler.RecipeBits.NOT_REMOVABLE | GT_ModHandler.RecipeBits.REVERSIBLE | GT_ModHandler.RecipeBits.BUFFERED, new Object[]{"PhP", "PFP", "PwP", Character.valueOf('P'), OrePrefixes.plate.get(Materials.Americium), Character.valueOf('F'), ItemList.Casing_Fusion});
