@@ -66,6 +66,26 @@ public class BaseMetaTileEntity extends BaseTileEntity implements IGregTechTileE
     private String mOwnerName = "";
     private NBTTagCompound mRecipeStuff = new NBTTagCompound();
 
+    private static final Field ENTITY_ITEM_HEALTH_FIELD;
+    static
+    {
+        Field f = null;
+
+        try {
+            f = EntityItem.class.getDeclaredField("field_70291_e");
+            f.setAccessible(true);
+        } catch (Exception e1) {
+            try {
+                f = EntityItem.class.getDeclaredField("health");
+                f.setAccessible(true);
+            } catch (Exception e2) {
+                e1.printStackTrace();
+                e2.printStackTrace();
+            }
+        }
+        ENTITY_ITEM_HEALTH_FIELD = f;
+    }
+
     public BaseMetaTileEntity() {
     }
 
@@ -1126,7 +1146,7 @@ public class BaseMetaTileEntity extends BaseTileEntity implements IGregTechTileE
                     }
                 }
             }
-            GT_Pollution.addPollution(new ChunkPosition(getXCoord(), getYCoord(), getZCoord()), 100000);
+            GT_Pollution.addPollution(getWorld(), new ChunkPosition(getXCoord(), getYCoord(), getZCoord()), 100000);
             mMetaTileEntity.doExplosion(aAmount);
         }
     }
@@ -1144,10 +1164,9 @@ public class BaseMetaTileEntity extends BaseTileEntity implements IGregTechTileE
         tItemEntity.hurtResistantTime = 999999;
         tItemEntity.lifespan = 60000;
         try {
-			Field tField = tItemEntity.getClass().getDeclaredField("health");
-			tField.setAccessible(true);
-			tField.setInt(tItemEntity, 99999999);
-		} catch (Exception e) {e.printStackTrace();}
+            if(ENTITY_ITEM_HEALTH_FIELD != null)
+                ENTITY_ITEM_HEALTH_FIELD.setInt(tItemEntity, 99999999);
+		} catch (Exception ignored) {}
         this.worldObj.spawnEntityInWorld(tItemEntity);
         tItem.stackSize = 0;                       	
     }

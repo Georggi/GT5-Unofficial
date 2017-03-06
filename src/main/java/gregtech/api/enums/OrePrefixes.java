@@ -434,6 +434,7 @@ public enum OrePrefixes {
         plateTriple.mGeneratedItems.add(Materials.Paper);
         plateQuadruple.mGeneratedItems.add(Materials.Paper);
         plateQuintuple.mGeneratedItems.add(Materials.Paper);
+        ring.mGeneratedItems.add(Materials.Paper);
 
         lens.mGeneratedItems.add(Materials.EnderPearl);
         lens.mGeneratedItems.add(Materials.EnderEye);
@@ -667,7 +668,7 @@ public enum OrePrefixes {
                         aMaterial == Materials.NiobiumTitanium || aMaterial == Materials.CertusQuartz || aMaterial == Materials.NetherQuartz || aMaterial == Materials.Lazurite || aMaterial == Materials.Lapis ||
                         aMaterial == Materials.Paper || aMaterial == Materials.Jasper || aMaterial == Materials.Dilithium || aMaterial == Materials.Forcicium || aMaterial == Materials.Forcillium ||
                         aMaterial == Materials.EnderPearl || aMaterial == Materials.EnderEye || aMaterial == Materials.Glass || aMaterial == Materials.Copper || aMaterial == Materials.Tin || aMaterial == Materials.Redstone ||
-                        aMaterial == Materials.Sodalite || aMaterial == Materials.Gallium))
+                        aMaterial == Materials.Sodalite || aMaterial == Materials.Gallium || aMaterial == Materials.GalliumArsenide || aMaterial == Materials.IndiumGalliumPhosphide))
                     plate.mDisabledItems.add(aMaterial);
                 //Ingot/Plate Storage
                 if (!enableUnusedDoubleIngots) ingotDouble.mDisabledItems.add(aMaterial);
@@ -691,17 +692,19 @@ public enum OrePrefixes {
                         aMaterial == Materials.Osmium || aMaterial == Materials.Iridium || aMaterial == Materials.Bronze || aMaterial == Materials.WroughtIron ||
                         aMaterial == Materials.Steel || aMaterial == Materials.StainlessSteel || aMaterial == Materials.PigIron || aMaterial == Materials.TungstenSteel ||
                         aMaterial == Materials.Rubber || aMaterial == Materials.HSSE || aMaterial == Materials.Neutronium || aMaterial == Materials.HSSG || aMaterial == Materials.Aluminium || 
-                        aMaterial == Materials.Invar || aMaterial == Materials.Brass))
+                        aMaterial == Materials.Invar || aMaterial == Materials.Brass || aMaterial == Materials.Paper))
                     ring.mDisabledItems.add(aMaterial);
                 //Foil
                 if (!enableUnusedFoil && !(aMaterial == Materials.Zinc || aMaterial == Materials.Aluminium || aMaterial == Materials.Silicon || aMaterial == Materials.Gold ||
                         aMaterial == Materials.Electrum || aMaterial == Materials.Platinum || aMaterial == Materials.Osmiridium || aMaterial == Materials.Osmium ||
                         aMaterial == Materials.AnnealedCopper || aMaterial == Materials.Steel || aMaterial == Materials.Copper || aMaterial == Materials.YttriumBariumCuprate
-                        || aMaterial == Materials.VanadiumGallium || aMaterial == Materials.NiobiumTitanium || aMaterial == Materials.Naquadah))
+                        || aMaterial == Materials.VanadiumGallium || aMaterial == Materials.NiobiumTitanium || aMaterial == Materials.Naquadah || aMaterial == Materials.Manganese ||
+                        aMaterial == Materials.Plastic || aMaterial == Materials.Silicone))
                     foil.mDisabledItems.add(aMaterial);
                 //Fine Wire
                 if (!enableUnusedFineWires && !(aMaterial == Materials.Steel || aMaterial == Materials.AnnealedCopper || aMaterial == Materials.Platinum || aMaterial == Materials.Osmium ||
-                        aMaterial == Materials.Tin || aMaterial == Materials.Lead || aMaterial == Materials.SolderingAlloy))
+                        aMaterial == Materials.Tin || aMaterial == Materials.Lead || aMaterial == Materials.SolderingAlloy || aMaterial == Materials.Copper || aMaterial == Materials.Electrum ||
+                        aMaterial == Materials.Gold || aMaterial == Materials.RedAlloy || aMaterial == Materials.Graphene || aMaterial == Materials.NiobiumTitanium || aMaterial == Materials.YttriumBariumCuprate ))
                     wireFine.mDisabledItems.add(aMaterial);
                 //Gears
                 if (!enableUnusedGears && !(aMaterial == Materials.Aluminium || aMaterial == Materials.Titanium || aMaterial == Materials.Iron || aMaterial == Materials.Copper ||

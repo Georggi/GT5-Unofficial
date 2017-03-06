@@ -73,8 +73,9 @@ public class GT_MetaTileEntity_OilDrill extends GT_MetaTileEntity_MultiBlockBase
                 }
             }
         }
-        FluidStack tFluid = GT_Utility.getUndergroundOil(getBaseMetaTileEntity().getWorld(), getBaseMetaTileEntity().getXCoord(), getBaseMetaTileEntity().getZCoord());
+        FluidStack tFluid = GT_Utility.getUndergroundOil(getBaseMetaTileEntity().getWorld(), getBaseMetaTileEntity().getXCoord(), getBaseMetaTileEntity().getZCoord(), true);
         if (tFluid == null) {
+        	stopMachine();
             return false;
         }
         if (getYOfPumpHead() > 0 && getBaseMetaTileEntity().getBlockOffset(ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetX, getYOfPumpHead() - 1 - getBaseMetaTileEntity().getYCoord(), ForgeDirection.getOrientation(getBaseMetaTileEntity().getBackFacing()).offsetZ) != Blocks.bedrock) {
@@ -218,11 +219,6 @@ public class GT_MetaTileEntity_OilDrill extends GT_MetaTileEntity_MultiBlockBase
 
     @Override
     public int getDamageToComponent(ItemStack aStack) {
-        return 0;
-    }
-
-    @Override
-    public int getAmountOfOutputs() {
         return 0;
     }
 

@@ -86,7 +86,7 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
             this.mEfficiency = 10000;
             this.mEfficiencyIncrease = 10000;
             this.mMaxProgresstime = Math.max(1, this.mMaxProgresstime);
-            GT_Pollution.addPollution(new ChunkPosition(this.getBaseMetaTileEntity().getXCoord(), this.getBaseMetaTileEntity().getYCoord(), this.getBaseMetaTileEntity().getZCoord()), mMaxProgresstime*5);
+            GT_Pollution.addPollution(this.getBaseMetaTileEntity().getWorld(), new ChunkPosition(this.getBaseMetaTileEntity().getXCoord(), this.getBaseMetaTileEntity().getYCoord(), this.getBaseMetaTileEntity().getZCoord()), mMaxProgresstime*5);
             return true;
         } else {
             this.mEfficiency = 0;
@@ -193,7 +193,7 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
 
     public boolean isWoodLog(Block log){
         String tTool = log.getHarvestTool(0);
-        return  OrePrefixes.log.contains(new ItemStack(log, 1))&& ((tTool != null) && (tTool.equals("axe"))) || (log.getMaterial() == Material.wood);
+        return  OrePrefixes.log.contains(new ItemStack(log, 1))&& ((tTool != null) && (tTool.equals("axe"))) && (log.getMaterial() == Material.wood);
     }
 
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
@@ -216,10 +216,6 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
 
     public int getDamageToComponent(ItemStack aStack) {
         return 0;
-    }
-
-    public int getAmountOfOutputs() {
-        return 1;
     }
 
     public boolean explodesOnComponentBreak(ItemStack aStack) {
