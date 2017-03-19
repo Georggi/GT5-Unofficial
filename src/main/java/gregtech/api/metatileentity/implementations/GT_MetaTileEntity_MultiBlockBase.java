@@ -175,9 +175,9 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
         }
         
         
-        int aInputFluidsLength = aNBT.getInteger("mOutputFluidsLength");
+        int aInputFluidsLength = aNBT.getInteger("mInputFluidsLength");
         if (aInputFluidsLength > 0) {
-            mOutputFluids = new FluidStack[aInputFluidsLength];
+            mInputFluids = new FluidStack[aInputFluidsLength];
         //mInputFluids = new FluidStack[getAmountOfOutputs()];
             for (int i = 0; i < mInputFluids.length; i++)
             	mInputFluids[i] = GT_Utility.loadFluid(aNBT, "mInputFluids" + i);
