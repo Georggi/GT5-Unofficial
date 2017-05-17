@@ -51,6 +51,15 @@ public interface IGT_RecipeAdder {
     public boolean addCentrifugeRecipe(ItemStack aInput1, ItemStack aInput2, FluidStack aFluidInput, FluidStack aFluidOutput, ItemStack aOutput1, ItemStack aOutput2, ItemStack aOutput3, ItemStack aOutput4, ItemStack aOutput5, ItemStack aOutput6, int[] aChances, int aDuration, int aEUt);
 
     /**
+     *
+     * @param aInput1   must be != null
+     * @param aOutput1  must be != null
+     * @param aDuration must be > 0
+     * @return
+     */
+    public boolean addCompressorRecipe(ItemStack aInput1, ItemStack aOutput1, int aDuration, int aEUt);
+
+    /**
      * Adds a Electrolyzer Recipe
      *
      * @param aInput1    must be != null
@@ -173,7 +182,7 @@ public interface IGT_RecipeAdder {
     public boolean addCNCRecipe(ItemStack aInput1, ItemStack aOutput1, int aDuration, int aEUt);
 
     /**
-     * Adds a Circuit Assembler Recipe
+     * Adds a Assembler Recipe
      *
      * @param aInput1   must be != null
      * @param aOutput1  must be != null
@@ -183,7 +192,7 @@ public interface IGT_RecipeAdder {
     public boolean addAssemblerRecipe(ItemStack aInput1, ItemStack aInput2, ItemStack aOutput1, int aDuration, int aEUt);
 
     /**
-     * Adds a Circuit Assembler Recipe
+     * Adds a Assembler Recipe
      *
      * @param aInput1   must be != null
      * @param aOutput1  must be != null
@@ -192,6 +201,20 @@ public interface IGT_RecipeAdder {
      */
     public boolean addAssemblerRecipe(ItemStack aInput1, ItemStack aInput2, FluidStack aFluidInput, ItemStack aOutput1, int aDuration, int aEUt);
 
+    public boolean addAssemblerRecipe(ItemStack aInput1, Object aOreDict, int aAmount, FluidStack aFluidInput, ItemStack aOutput1, int aDuration, int aEUt);
+
+
+    /**
+     * Adds a Assembler Recipe
+     *
+     * @param aInputs   must be 1-6 ItemStacks
+     * @param aFluidInput 0-1 fluids
+     * @param aOutput  must be != null
+     * @param aDuration must be > 0
+     * @param aEUt      should be > 0
+     */
+    public boolean addCircuitAssemblerRecipe(ItemStack[] aInputs, FluidStack aFluidInput, ItemStack aOutput, int aDuration, int aEUt);
+    
     /**
      * Adds a Assemblyline Recipe
      *
@@ -266,6 +289,17 @@ public interface IGT_RecipeAdder {
     public boolean addSlicerRecipe(ItemStack aInput, ItemStack aShape, ItemStack aOutput, int aDuration, int aEUt);
 
     /**
+     *
+     * @param aInput   must be != null
+     * @param aFluidInput   must be != null
+     * @param aOutput1  must be != null
+     * @param aDuration must be > 0
+     * @param aEUt      should be > 0
+     * @return
+     */
+    public boolean addOreWasherRecipe(ItemStack aInput, ItemStack aOutput1, ItemStack aOutput2, ItemStack aOutput3, FluidStack aFluidInput, int aDuration, int aEUt);
+
+    /**
      * Adds an Implosion Compressor Recipe
      *
      * @param aInput1  must be != null
@@ -328,6 +362,16 @@ public interface IGT_RecipeAdder {
      * Adds a Boxing Recipe
      */
     public boolean addBoxingRecipe(ItemStack aContainedItem, ItemStack aEmptyBox, ItemStack aFullBox, int aDuration, int aEUt);
+
+    /**
+     *
+     * @param aInput   must be != null
+     * @param aOutput1  must be != null
+     * @param aDuration must be > 0
+     * @param aEUt      should be > 0
+     * @return
+     */
+    public boolean addThermalCentrifugeRecipe(ItemStack aInput, ItemStack aOutput1, ItemStack aOutput2, ItemStack aOutput3, int aDuration, int aEUt);
 
     /**
      * Adds an Unboxing Recipe
@@ -414,6 +458,11 @@ public interface IGT_RecipeAdder {
     public boolean addElectromagneticSeparatorRecipe(ItemStack aInput, ItemStack aOutput1, ItemStack aOutput2, ItemStack aOutput3, int[] aChances, int aDuration, int aEUt);
 
     /**
+     * Adds a Recipe for the Extractor
+     */
+    public boolean addExtractorRecipe(ItemStack aInput, ItemStack aOutput, int aDuration, int aEUt);
+
+    /**
      * Adds a Recipe for the Printer
      */
     public boolean addPrinterRecipe(ItemStack aInput, FluidStack aFluid, ItemStack aSpecialSlot, ItemStack aOutput, int aDuration, int aEUt);
@@ -424,6 +473,11 @@ public interface IGT_RecipeAdder {
     public boolean addAutoclaveRecipe(ItemStack aInput, FluidStack aFluid, ItemStack aOutput, int aChance, int aDuration, int aEUt);
 
     /**
+     * Adds a Recipe for the Autoclave
+     */
+    public boolean addAutoclaveRecipe(ItemStack aInput, FluidStack aFluid, ItemStack aOutput, int aChance, int aDuration, int aEUt, boolean aCleanroom);
+
+    /**
      * Adds a Recipe for the Mixer
      */
     public boolean addMixerRecipe(ItemStack aInput1, ItemStack aInput2, ItemStack aInput3, ItemStack aInput4, FluidStack aFluidInput, FluidStack aFluidOutput, ItemStack aOutput, int aDuration, int aEUt);
@@ -432,6 +486,10 @@ public interface IGT_RecipeAdder {
      * Adds a Recipe for the Laser Engraver
      */
     public boolean addLaserEngraverRecipe(ItemStack aItemToEngrave, ItemStack aLens, ItemStack aEngravedItem, int aDuration, int aEUt);
+    /**
+     * Adds a Recipe for the Laser Engraver
+     */
+    public boolean addLaserEngraverRecipe(ItemStack aItemToEngrave, ItemStack aLens, ItemStack aEngravedItem, int aDuration, int aEUt, boolean aCleanroom);
 
     /**
      * Adds a Recipe for the Forming Press

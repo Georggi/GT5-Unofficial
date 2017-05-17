@@ -20,6 +20,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 
 public class GT_MetaTileEntity_OilCracker extends GT_MetaTileEntity_MultiBlockBase {
+    private final FluidStack fluidToDecreaseEu = GT_ModHandler.getSteam(128);
+    private final FluidStack fluidToIncreaseOutput = Materials.Hydrogen.getGas(64);
+
 
     public GT_MetaTileEntity_OilCracker(int aID, String aName, String aNameRegional) {
         super(aID, aName, aNameRegional);
@@ -35,11 +38,11 @@ public class GT_MetaTileEntity_OilCracker extends GT_MetaTileEntity_MultiBlockBa
                 "Cracks heavy oil into lighter parts",
                 "Size(WxHxD): 5x3x3 (Hollow), Controller (Front center)",
                 "Ring of 8 Cupronickel Coils (Each side of Controller)",
-                "1x Input Hatch (Left side middle)",
+                "1x Input Hatch (Any left side casing)",
                 "1x Input Hatch (Any middle ring casing)",
-                "1x Output Hatch (Right side middle)",
-                "1x Maintenance Hatch (Any casing)",
-                "1x Energy Hatch (Any casing)",
+                "1x Output Hatch (Any right side casing)",
+                "1x Maintenance Hatch (Any middle ring casing)",
+                "1x Energy Hatch (Any middle ring casing)",
                 "Clean Stainless Steel Casings for the rest (18 at least!)",
                 "Optional Steam(50% less EU/t) or Hydrogen(30% more output)"};
     }
@@ -66,20 +69,8 @@ public class GT_MetaTileEntity_OilCracker extends GT_MetaTileEntity_MultiBlockBa
             GT_Recipe tRecipe = GT_Recipe.GT_Recipe_Map.sCrakingRecipes.findRecipe(getBaseMetaTileEntity(), false, gregtech.api.enums.GT_Values.V[tTier], new FluidStack[]{tInput}, new ItemStack[]{});
             if (tRecipe != null) {
                 if (tRecipe.isRecipeInputEqual(true, new FluidStack[]{tInput}, new ItemStack[]{})) {
-                    boolean steam = false;
-                    boolean hydrogen = false;
-                    for (FluidStack tInput2 : tInputList) {
-                        if (tInput2.getFluid() == GT_ModHandler.getSteam(1).getFluid()) {
-                            steam = true;
-                            tInput2.amount -= 128;
-                        }
-                        if (tInput2.getFluid() == Materials.Hydrogen.mGas) {
-                            hydrogen = true;
-                            steam = false;
-                            tInput2.amount -= 64;
-                        }
-
-                    }
+                    boolean needDecreaseEu = depleteInput(fluidToDecreaseEu);
+                    boolean needIncreaseOutput = !needDecreaseEu && depleteInput(fluidToIncreaseOutput);
 
                     this.mEfficiency = (10000 - (getIdealStatus() - getRepairStatus()) * 1000);
                     this.mEfficiencyIncrease = 10000;
@@ -94,13 +85,13 @@ public class GT_MetaTileEntity_OilCracker extends GT_MetaTileEntity_MultiBlockBa
                             this.mMaxProgresstime /= 2;
                         }
                     }
-                    if (steam) this.mEUt = this.mEUt / 2;
+                    if (needDecreaseEu) this.mEUt = this.mEUt / 2;
                     if (this.mEUt > 0) {
                         this.mEUt = (-this.mEUt);
                     }
                     this.mMaxProgresstime = Math.max(1, this.mMaxProgresstime);
                     this.mOutputFluids = new FluidStack[]{tRecipe.getFluidOutput(0)};
-                    if (hydrogen) this.mOutputFluids[0].amount = this.mOutputFluids[0].amount * 130 / 100;
+                    if (needIncreaseOutput) this.mOutputFluids[0].amount = this.mOutputFluids[0].amount * 130 / 100;
                     return true;
                 }
             }
@@ -207,7 +198,7 @@ public class GT_MetaTileEntity_OilCracker extends GT_MetaTileEntity_MultiBlockBa
                 }
             }
         }
-        if (amount < 19) return false;
+        if (amount < 18) return false;
         return true;
     }
 
@@ -228,11 +219,6 @@ public class GT_MetaTileEntity_OilCracker extends GT_MetaTileEntity_MultiBlockBa
 
     @Override
     public int getDamageToComponent(ItemStack aStack) {
-        return 0;
-    }
-
-    @Override
-    public int getAmountOfOutputs() {
         return 0;
     }
 

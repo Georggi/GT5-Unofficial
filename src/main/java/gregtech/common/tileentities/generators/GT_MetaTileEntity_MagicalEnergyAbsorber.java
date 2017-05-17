@@ -28,12 +28,13 @@ import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.api.visnet.VisNetHandler;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static gregtech.api.enums.GT_Values.V;
 
 public class GT_MetaTileEntity_MagicalEnergyAbsorber extends GT_MetaTileEntity_BasicGenerator {
 
-    public static final ArrayList<EntityEnderCrystal> sUsedDragonCrystalList = new ArrayList();
+    public static final ArrayList<EntityEnderCrystal> sUsedDragonCrystalList = new ArrayList<EntityEnderCrystal>();
     public static boolean sAllowMultipleEggs = true;
     public static GT_MetaTileEntity_MagicalEnergyAbsorber mActiveSiphon = null;
     public static int sEnergyPerEnderCrystal = 32;
@@ -52,13 +53,18 @@ public class GT_MetaTileEntity_MagicalEnergyAbsorber extends GT_MetaTileEntity_B
         super(aName, aTier, aDescription, aTextures);
         onConfigLoad();
     }
+    
+    public GT_MetaTileEntity_MagicalEnergyAbsorber(String aName, int aTier, String[] aDescription, ITexture[][][] aTextures) {
+        super(aName, aTier, aDescription, aTextures);
+        onConfigLoad();
+    }
 
     public boolean isOutputFacing(byte aSide) {
         return aSide == getBaseMetaTileEntity().getFrontFacing();
     }
 
     public MetaTileEntity newMetaEntity(IGregTechTileEntity aTileEntity) {
-        return new GT_MetaTileEntity_MagicalEnergyAbsorber(this.mName, this.mTier, this.mDescription, this.mTextures);
+        return new GT_MetaTileEntity_MagicalEnergyAbsorber(this.mName, this.mTier, this.mDescriptionArray, this.mTextures);
     }
 
     public GT_Recipe.GT_Recipe_Map getRecipes() {
@@ -163,7 +169,7 @@ public class GT_MetaTileEntity_MagicalEnergyAbsorber extends GT_MetaTileEntity_B
                 if ((this.mInventory[0] != null) && (this.mInventory[1] == null)) {
                     if (isThaumcraftLoaded && this.mInventory[0].getItem() instanceof IEssentiaContainerItem) {
                         AspectList tAspect = ((IEssentiaContainerItem) this.mInventory[0].getItem()).getAspects(this.mInventory[0]);
-                        TC_Aspects tValue = TC_Aspects.valueOf(tAspect.getAspects()[0].getTag().toUpperCase());
+                        TC_Aspects tValue = TC_Aspects.valueOf(tAspect.getAspects()[0].getTag().toUpperCase(Locale.ENGLISH));
                         int tEU = (tValue.mValue * tAspect.getAmount((Aspect) tValue.mAspect) * 100);
                         getBaseMetaTileEntity().increaseStoredEnergyUnits(tEU * getEfficiency() / 100, true);
                         ItemStack tStack = this.mInventory[0].copy();

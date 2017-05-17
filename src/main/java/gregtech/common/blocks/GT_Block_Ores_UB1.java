@@ -14,7 +14,7 @@ public class GT_Block_Ores_UB1 extends GT_Block_Ores_Abstract {
     Block aUBBlock = GameRegistry.findBlock("UndergroundBiomes", "igneousStone");
 
     public GT_Block_Ores_UB1() {
-        super("gt.blockores.ub1", 8, Material.rock);
+        super("gt.blockores.ub1", 8, true, Material.rock);
         if (aUBBlock == null) aUBBlock = Blocks.stone;
     }
 
@@ -26,6 +26,11 @@ public class GT_Block_Ores_UB1 extends GT_Block_Ores_Abstract {
     @Override
     public OrePrefixes[] getProcessingPrefix() { //Must have 8 entries.
         return new OrePrefixes[]{OrePrefixes.oreRedgranite, OrePrefixes.oreBlackgranite, OrePrefixes.ore, OrePrefixes.ore, OrePrefixes.ore, OrePrefixes.oreBasalt, OrePrefixes.ore, OrePrefixes.ore};
+    }
+
+    @Override
+    public int getBaseBlockHarvestLevel(int aMeta) {
+        return aUBBlock.getHarvestLevel(aMeta);
     }
 
     @Override
