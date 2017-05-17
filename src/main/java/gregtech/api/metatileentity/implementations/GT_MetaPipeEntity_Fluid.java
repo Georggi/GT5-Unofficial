@@ -2,6 +2,7 @@ package gregtech.api.metatileentity.implementations;
 
 import gregtech.api.GregTech_API;
 import gregtech.api.enums.Dyes;
+import gregtech.api.enums.ItemList;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.OrePrefixes;
 import gregtech.api.enums.SubTag;
@@ -12,6 +13,7 @@ import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.metatileentity.BaseMetaPipeEntity;
 import gregtech.api.metatileentity.MetaPipeEntity;
 import gregtech.api.objects.GT_RenderedTexture;
+import gregtech.api.objects.XSTR;
 import gregtech.api.util.GT_Log;
 import gregtech.api.util.GT_Utility;
 import net.minecraft.entity.Entity;
@@ -27,8 +29,8 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static gregtech.api.enums.GT_Values.D1;
 
@@ -186,7 +188,7 @@ public class GT_MetaPipeEntity_Fluid extends MetaPipeEntity {
             }
 
             if (mLastReceivedFrom == oLastReceivedFrom) {
-                HashMap<IFluidHandler, ForgeDirection> tTanks = new HashMap<IFluidHandler, ForgeDirection>();
+                ConcurrentHashMap<IFluidHandler, ForgeDirection> tTanks = new ConcurrentHashMap<IFluidHandler, ForgeDirection>();
 
                 mConnections = 0;
 
@@ -202,7 +204,7 @@ public class GT_MetaPipeEntity_Fluid extends MetaPipeEntity {
                                     continue;
                                 }
                             }
-                        }
+                        }   
                         FluidTankInfo[] tInfo = tTileEntity.getTankInfo(ForgeDirection.getOrientation(tSide).getOpposite());
                         if (tInfo != null && tInfo.length > 0) {
                             if (tTileEntity instanceof ICoverable && ((ICoverable) tTileEntity).getCoverBehaviorAtSide(GT_Utility.getOppositeSide(tSide)).alwaysLookConnected(GT_Utility.getOppositeSide(tSide), ((ICoverable) tTileEntity).getCoverIDAtSide(GT_Utility.getOppositeSide(tSide)), ((ICoverable) tTileEntity).getCoverDataAtSide(GT_Utility.getOppositeSide(tSide)), ((ICoverable) tTileEntity))) {
@@ -216,9 +218,22 @@ public class GT_MetaPipeEntity_Fluid extends MetaPipeEntity {
                                 if (((1 << tSide) & mLastReceivedFrom) == 0)
                                     tTanks.put(tTileEntity, ForgeDirection.getOrientation(tSide).getOpposite());
                             }
+
                             if (aBaseMetaTileEntity.getCoverBehaviorAtSide(tSide).alwaysLookConnected(tSide, aBaseMetaTileEntity.getCoverIDAtSide(tSide), aBaseMetaTileEntity.getCoverDataAtSide(tSide), aBaseMetaTileEntity)) {
                                 mConnections |= (1 << tSide);
                             }
+                        }else if(tInfo != null && tInfo.length == 0){  
+                        	IGregTechTileEntity tSideTile = aBaseMetaTileEntity.getIGregTechTileEntityAtSide(tSide);
+                            if(tSideTile!=null){
+                            	ItemStack tCover = tSideTile.getCoverItemAtSide(GT_Utility.getOppositeSide(tSide));
+                            	if (tCover!=null &&(GT_Utility.areStacksEqual(tCover, ItemList.FluidRegulator_LV.get(1, new Object[]{},true)) || 
+                            			GT_Utility.areStacksEqual(tCover, ItemList.FluidRegulator_MV.get(1, new Object[]{},true)) || 
+                            			GT_Utility.areStacksEqual(tCover, ItemList.FluidRegulator_HV.get(1, new Object[]{},true)) || 
+                            			GT_Utility.areStacksEqual(tCover, ItemList.FluidRegulator_EV.get(1, new Object[]{},true)) || 
+                            			GT_Utility.areStacksEqual(tCover, ItemList.FluidRegulator_IV.get(1, new Object[]{},true)))) {
+                            		mConnections |= (1 << tSide);
+                            	}
+                            }                        	
                         }
                     }
                 }
@@ -264,7 +279,7 @@ public class GT_MetaPipeEntity_Fluid extends MetaPipeEntity {
             GT_Utility.doSoundAtClient(GregTech_API.sSoundList.get(4), 5, 1.0F, aX, aY, aZ);
             for (byte i = 0; i < 6; i++)
                 for (int l = 0; l < 2; ++l)
-                    getBaseMetaTileEntity().getWorld().spawnParticle("largesmoke", aX - 0.5 + Math.random(), aY - 0.5 + Math.random(), aZ - 0.5 + Math.random(), ForgeDirection.getOrientation(i).offsetX / 5.0, ForgeDirection.getOrientation(i).offsetY / 5.0, ForgeDirection.getOrientation(i).offsetZ / 5.0);
+                    getBaseMetaTileEntity().getWorld().spawnParticle("largesmoke", aX - 0.5 + (new XSTR()).nextFloat(), aY - 0.5 + (new XSTR()).nextFloat(), aZ - 0.5 + (new XSTR()).nextFloat(), ForgeDirection.getOrientation(i).offsetX / 5.0, ForgeDirection.getOrientation(i).offsetY / 5.0, ForgeDirection.getOrientation(i).offsetZ / 5.0);
         }
     }
 
@@ -364,8 +379,8 @@ public class GT_MetaPipeEntity_Fluid extends MetaPipeEntity {
     @Override
     public String[] getDescription() {
         return new String[]{
-                EnumChatFormatting.BLUE + "Fluid Capacity: " + (mCapacity * 20) + "L/sec" + EnumChatFormatting.GRAY,
-                EnumChatFormatting.RED + "Heat Limit: " + mHeatResistance + " K" + EnumChatFormatting.GRAY
+                EnumChatFormatting.BLUE + "Fluid Capacity: %%%" + (mCapacity * 20) + "L/sec" + EnumChatFormatting.GRAY,
+                EnumChatFormatting.RED + "Heat Limit: %%%" + mHeatResistance + " K" + EnumChatFormatting.GRAY
         };
     }
 

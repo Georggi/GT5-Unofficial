@@ -9,6 +9,7 @@ import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.metatileentity.implementations.GT_MetaTileEntity_MultiBlockBase;
 import gregtech.api.objects.GT_RenderedTexture;
 import gregtech.api.util.GT_Recipe;
+import gregtech.common.GT_Pollution;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,7 +44,8 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
                 "11x1x11 of Bricks (Bottom layer only)",
                 "11x5x11 of Logs (Above bottom Brick layer)",
                 "Only grass/dirt can touch Log blocks",
-                "No air between logs allowed"};
+                "No air between logs allowed",
+                "Causes 100 Pollution per second"};
     }
 
     public ITexture[] getTexture(IGregTechTileEntity aBaseMetaTileEntity, byte aSide, byte aFacing, byte aColorIndex, boolean aActive, boolean aRedstone) {
@@ -74,6 +76,10 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
 
     public boolean checkRecipe(ItemStack aStack) {
         if (!checkRecursiveBlocks()) {
+            this.mEfficiency = 0;
+            this.mEfficiencyIncrease = 0;
+            this.mMaxProgresstime = 0;
+            running = false;
             return false;
         }
 
@@ -81,6 +87,7 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
             this.mEfficiency = 10000;
             this.mEfficiencyIncrease = 10000;
             this.mMaxProgresstime = Math.max(1, this.mMaxProgresstime);
+            GT_Pollution.addPollution(this.getBaseMetaTileEntity().getWorld(), new ChunkPosition(this.getBaseMetaTileEntity().getXCoord(), this.getBaseMetaTileEntity().getYCoord(), this.getBaseMetaTileEntity().getZCoord()), mMaxProgresstime*5);
             return true;
         } else {
             this.mEfficiency = 0;
@@ -187,7 +194,7 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
 
     public boolean isWoodLog(Block log){
         String tTool = log.getHarvestTool(0);
-        return  OrePrefixes.log.contains(new ItemStack(log, 1))&& ((tTool != null) && (tTool.equals("axe"))) || (log.getMaterial() == Material.wood);
+        return  OrePrefixes.log.contains(new ItemStack(log, 1))&& ((tTool != null) && (tTool.equals("axe"))) && (log.getMaterial() == Material.wood);
     }
 
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
@@ -210,10 +217,6 @@ public class GT_MetaTileEntity_Charcoal_Pit extends GT_MetaTileEntity_MultiBlock
 
     public int getDamageToComponent(ItemStack aStack) {
         return 0;
-    }
-
-    public int getAmountOfOutputs() {
-        return 1;
     }
 
     public boolean explodesOnComponentBreak(ItemStack aStack) {

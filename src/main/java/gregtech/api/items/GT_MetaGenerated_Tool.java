@@ -6,6 +6,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.enderio.api.tool.ITool;
 import forestry.api.arboriculture.IToolGrafter;
+import gregtech.GT_Mod;
 import gregtech.api.GregTech_API;
 import gregtech.api.enchants.Enchantment_Radioactivity;
 import gregtech.api.enums.Materials;
@@ -16,6 +17,7 @@ import gregtech.api.util.GT_LanguageManager;
 import gregtech.api.util.GT_ModHandler;
 import gregtech.api.util.GT_OreDictUnificator;
 import gregtech.api.util.GT_Utility;
+import gregtech.common.GT_Proxy;
 import mods.railcraft.api.core.items.IToolCrowbar;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -43,17 +45,16 @@ import net.minecraftforge.common.IShearable;
 import net.minecraftforge.event.world.BlockEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static gregtech.api.enums.GT_Values.MOD_ID_FR;
 import static gregtech.api.enums.GT_Values.MOD_ID_RC;
 
 /**
  * This is an example on how you can create a Tool ItemStack, in this case a Bismuth Wrench:
- * GT_MetaGenerated_Tool.sInstances.get("gt.metatool.01").getToolWithStats(16, 1, Materials.Bismuth, Materials.Bismuth, null);
+ * GT_MetaGenerated_Tool.sInstances.get("gt.metatool.01").getToolWithStats(GT_MetaGenerated_Tool_01.WRENCH, 1, Materials.Bismuth, Materials.Bismuth, null);
  */
 @Optional.InterfaceList(value = {@Optional.Interface(iface = "forestry.api.arboriculture.IToolGrafter", modid = MOD_ID_FR), @Optional.Interface(iface = "mods.railcraft.api.core.items.IToolCrowbar", modid = MOD_ID_RC), @Optional.Interface(iface = "buildcraft.api.tools.IToolWrench", modid = "BuildCraft"), @Optional.Interface(iface = "crazypants.enderio.api.tool.ITool", modid = "EnderIO")})
 public abstract class GT_MetaGenerated_Tool extends GT_MetaBase_Item implements IDamagableItem, IToolGrafter, IToolCrowbar, IToolWrench, ITool {
@@ -63,11 +64,11 @@ public abstract class GT_MetaGenerated_Tool extends GT_MetaBase_Item implements 
      * <p/>
      * You can also use the unlocalized Name gotten from getUnlocalizedName() as Key if you want to get a specific Item.
      */
-    public static final HashMap<String, GT_MetaGenerated_Tool> sInstances = new HashMap<String, GT_MetaGenerated_Tool>();
+    public static final ConcurrentHashMap<String, GT_MetaGenerated_Tool> sInstances = new ConcurrentHashMap<String, GT_MetaGenerated_Tool>();
 
 	/* ---------- CONSTRUCTOR AND MEMBER VARIABLES ---------- */
 
-    public final HashMap<Short, IToolStats> mToolStats = new HashMap<Short, IToolStats>();
+    public final ConcurrentHashMap<Short, IToolStats> mToolStats = new ConcurrentHashMap<Short, IToolStats>();
 
     /**
      * Creates the Item using these Parameters.
@@ -341,7 +342,7 @@ public abstract class GT_MetaGenerated_Tool extends GT_MetaBase_Item implements 
                 aList.add(tOffset + 2, EnumChatFormatting.WHITE + "Turbine Efficency: " + EnumChatFormatting.BLUE + (50.0F + (10.0F * getToolCombatDamage(aStack))) + EnumChatFormatting.GRAY);
                 aList.add(tOffset + 3, EnumChatFormatting.WHITE + "Optimal Steam flow: " + EnumChatFormatting.LIGHT_PURPLE + Math.max(Float.MIN_NORMAL, tStats.getSpeedMultiplier() * getPrimaryMaterial(aStack).mToolSpeed * 1000) + EnumChatFormatting.GRAY + "L/sec");
                 aList.add(tOffset + 3, EnumChatFormatting.WHITE + "Optimal Gas flow(EU burnvalue per tick): " + EnumChatFormatting.LIGHT_PURPLE + Math.max(Float.MIN_NORMAL, tStats.getSpeedMultiplier() * getPrimaryMaterial(aStack).mToolSpeed * 50) + EnumChatFormatting.GRAY + "EU/t");
-                aList.add(tOffset + 3, EnumChatFormatting.WHITE + "Optimal Plasma flow(Plasma energyvalue per tick): " + EnumChatFormatting.LIGHT_PURPLE + Math.max(Float.MIN_NORMAL, tStats.getSpeedMultiplier() * getPrimaryMaterial(aStack).mToolSpeed * 1000) + EnumChatFormatting.GRAY + "EU/t");
+                aList.add(tOffset + 3, EnumChatFormatting.WHITE + "Optimal Plasma flow(Plasma energyvalue per tick): " + EnumChatFormatting.LIGHT_PURPLE + Math.max(Float.MIN_NORMAL, tStats.getSpeedMultiplier() * getPrimaryMaterial(aStack).mToolSpeed * 2000) + EnumChatFormatting.GRAY + "EU/t");
 
             } else {
                 aList.add(tOffset + 0, EnumChatFormatting.WHITE + "Durability: " + EnumChatFormatting.GREEN + (tMaxDamage - getToolDamage(aStack)) + " / " + tMaxDamage + EnumChatFormatting.GRAY);
@@ -415,7 +416,7 @@ public abstract class GT_MetaGenerated_Tool extends GT_MetaBase_Item implements 
             return true;
         }
         if (use(aStack, (int) aAmount, null)) {
-            if (new Random().nextInt(25) == 0) {
+            if (java.util.concurrent.ThreadLocalRandom.current().nextInt(0, 25) == 0) {
                 long tNewDamage = getToolDamage(aStack) + aAmount;
                 setToolDamage(aStack, tNewDamage);
                 if (tNewDamage >= getToolMaxDamage(aStack)) {
@@ -477,7 +478,8 @@ public abstract class GT_MetaGenerated_Tool extends GT_MetaBase_Item implements 
         if (tStats == null) return null;
         doDamage(aStack, tStats.getToolDamagePerContainerCraft());
         aStack = aStack.stackSize > 0 ? aStack : null;
-        if (playSound) {
+        if (playSound && GT_Mod.gregtechproxy.mTicksUntilNextCraftSound <= 0) {
+        	GT_Mod.gregtechproxy.mTicksUntilNextCraftSound = 10;
             String sound = (aStack == null) ? tStats.getBreakingSound() : tStats.getCraftingSound();
             GT_Utility.doSoundAtClient(sound, 1, 1.0F);
         }
@@ -600,13 +602,13 @@ public abstract class GT_MetaGenerated_Tool extends GT_MetaBase_Item implements 
     @Override
     public boolean isItemStackUsable(ItemStack aStack) {
         IToolStats tStats = getToolStatsInternal(aStack);
-        if (aStack.getItemDamage() % 2 == 1 || tStats == null) {
+        if (aStack.getItemDamage() % 2 != 0 || tStats == null) {
             NBTTagCompound aNBT = aStack.getTagCompound();
             if (aNBT != null) aNBT.removeTag("ench");
             return false;
         }
         Materials aMaterial = getPrimaryMaterial(aStack);
-        HashMap<Integer, Integer> tMap = new HashMap<Integer, Integer>(), tResult = new HashMap<Integer, Integer>();
+        ConcurrentHashMap<Integer, Integer> tMap = new ConcurrentHashMap<Integer, Integer>(), tResult = new ConcurrentHashMap<Integer, Integer>();
         if (aMaterial.mEnchantmentTools != null) {
             tMap.put(aMaterial.mEnchantmentTools.effectId, (int) aMaterial.mEnchantmentToolsLevel);
             if (aMaterial.mEnchantmentTools == Enchantment.fortune)

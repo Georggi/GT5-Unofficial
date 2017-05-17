@@ -25,8 +25,6 @@ import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import static gregtech.api.enums.GT_Values.V;
 
 public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
@@ -51,7 +49,7 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
 
     public GT_MetaTileEntity_MultiBlockBase(int aID, String aName, String aNameRegional) {
         super(aID, aName, aNameRegional, 2);
-        this.disableMaintenance = GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.disableMaintenance", false);
+        GT_MetaTileEntity_MultiBlockBase.disableMaintenance = GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.disableMaintenance", false);
         this.damageFactorLow = GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.damageFactorLow", 5);
         this.damageFactorHigh = (float) GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.damageFactorHigh", 0.6f);
         this.mNEI = "";
@@ -59,7 +57,7 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
 
     public GT_MetaTileEntity_MultiBlockBase(String aName) {
         super(aName, 2);
-        this.disableMaintenance = GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.disableMaintenance", false);
+        GT_MetaTileEntity_MultiBlockBase.disableMaintenance = GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.disableMaintenance", false);
         this.damageFactorLow = GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.damageFactorLow", 5);
         this.damageFactorHigh = (float) GregTech_API.sMachineFile.get(ConfigCategories.machineconfig, "MultiBlockMachines.damageFactorHigh", 0.6f);
     }
@@ -118,18 +116,24 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
         aNBT.setInteger("mPollution", mPollution);
         aNBT.setInteger("mRuntime", mRuntime);
 
-        if (mOutputItems != null) for (int i = 0; i < mOutputItems.length; i++)
-            if (mOutputItems[i] != null) {
-                NBTTagCompound tNBT = new NBTTagCompound();
-                mOutputItems[i].writeToNBT(tNBT);
-                aNBT.setTag("mOutputItem" + i, tNBT);
-            }
-        if (mOutputFluids != null) for (int i = 0; i < mOutputFluids.length; i++)
-            if (mOutputFluids[i] != null) {
-                NBTTagCompound tNBT = new NBTTagCompound();
-                mOutputFluids[i].writeToNBT(tNBT);
-                aNBT.setTag("mOutputFluids" + i, tNBT);
-            }
+        if (mOutputItems != null) {
+            aNBT.setInteger("mOutputItemsLength", mOutputItems.length);
+            for (int i = 0; i < mOutputItems.length; i++)
+                if (mOutputItems[i] != null) {
+                    NBTTagCompound tNBT = new NBTTagCompound();
+                    mOutputItems[i].writeToNBT(tNBT);
+                    aNBT.setTag("mOutputItem" + i, tNBT);
+                }
+        }
+        if (mOutputFluids != null) {
+            aNBT.setInteger("mOutputFluidsLength", mOutputFluids.length);
+            for (int i = 0; i < mOutputFluids.length; i++)
+                if (mOutputFluids[i] != null) {
+                    NBTTagCompound tNBT = new NBTTagCompound();
+                    mOutputFluids[i].writeToNBT(tNBT);
+                    aNBT.setTag("mOutputFluids" + i, tNBT);
+                }
+        }
         aNBT.setBoolean("mWrench", mWrench);
         aNBT.setBoolean("mScrewdriver", mScrewdriver);
         aNBT.setBoolean("mSoftHammer", mSoftHammer);
@@ -148,11 +152,21 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
         mEfficiency = aNBT.getInteger("mEfficiency");
         mPollution = aNBT.getInteger("mPollution");
         mRuntime = aNBT.getInteger("mRuntime");
-        mOutputItems = new ItemStack[getAmountOfOutputs()];
-        for (int i = 0; i < mOutputItems.length; i++) mOutputItems[i] = GT_Utility.loadItem(aNBT, "mOutputItem" + i);
-        mOutputFluids = new FluidStack[getAmountOfOutputs()];
-        for (int i = 0; i < mOutputFluids.length; i++)
-            mOutputFluids[i] = GT_Utility.loadFluid(aNBT, "mOutputFluids" + i);
+
+        int aOutputItemsLength = aNBT.getInteger("mOutputItemsLength");
+        if (aOutputItemsLength > 0) {
+            mOutputItems = new ItemStack[aOutputItemsLength];
+            for (int i = 0; i < mOutputItems.length; i++)
+                mOutputItems[i] = GT_Utility.loadItem(aNBT, "mOutputItem" + i);
+        }
+
+        int aOutputFluidsLength = aNBT.getInteger("mOutputFluidsLength");
+        if (aOutputFluidsLength > 0) {
+            mOutputFluids = new FluidStack[aOutputFluidsLength];
+            for (int i = 0; i < mOutputFluids.length; i++)
+                mOutputFluids[i] = GT_Utility.loadFluid(aNBT, "mOutputFluids" + i);
+        }
+
         mWrench = aNBT.getBoolean("mWrench");
         mScrewdriver = aNBT.getBoolean("mScrewdriver");
         mSoftHammer = aNBT.getBoolean("mSoftHammer");
@@ -207,7 +221,9 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
                 if (mMachine) {
                     for (GT_MetaTileEntity_Hatch_Maintenance tHatch : mMaintenanceHatches) {
                         if (isValidMetaTileEntity(tHatch)) {
-                            if (!this.disableMaintenance) {
+                            if (!GT_MetaTileEntity_MultiBlockBase.disableMaintenance) {
+                                if (tHatch.mAuto && (!mWrench || !mScrewdriver || !mSoftHammer || !mHardHammer || !mSolderingTool || !mCrowbar))
+                                    tHatch.autoMaintainance();
                                 if (tHatch.mWrench) mWrench = true;
                                 if (tHatch.mScrewdriver) mScrewdriver = true;
                                 if (tHatch.mSoftHammer) mSoftHammer = true;
@@ -241,8 +257,8 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
                                     if (mOutputItems != null) for (ItemStack tStack : mOutputItems)
                                         if (tStack != null) {
                                             try {
-                                                GT_Mod.instance.achievements.issueAchivementHatch(aBaseMetaTileEntity.getWorld().getPlayerEntityByName(aBaseMetaTileEntity.getOwnerName()), tStack);
-                                            } catch (Exception e) {
+                                                GT_Mod.achievements.issueAchivementHatch(aBaseMetaTileEntity.getWorld().getPlayerEntityByName(aBaseMetaTileEntity.getOwnerName()), tStack);
+                                            } catch (Exception ignored) {
                                             }
                                             addOutput(tStack);
                                         }
@@ -263,8 +279,8 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
                                     if (mOutputFluids != null && mOutputFluids.length > 0) {
                                         if (mOutputFluids.length > 1) {
                                             try {
-                                                GT_Mod.instance.achievements.issueAchievement(aBaseMetaTileEntity.getWorld().getPlayerEntityByName(aBaseMetaTileEntity.getOwnerName()), "oilplant");
-                                            } catch (Exception e) {
+                                                GT_Mod.achievements.issueAchievement(aBaseMetaTileEntity.getWorld().getPlayerEntityByName(aBaseMetaTileEntity.getOwnerName()), "oilplant");
+                                            } catch (Exception ignored) {
                                             }
                                         }
                                     }
@@ -355,12 +371,6 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
     public abstract int getDamageToComponent(ItemStack aStack);
 
     /**
-     * Gets the Amount of possibly outputted Items for loading the Output Stack Array from NBT.
-     * This should be the largest Amount that can ever happen legitimately.
-     */
-    public abstract int getAmountOfOutputs();
-
-    /**
      * If it explodes when the Component has to be replaced.
      */
     public abstract boolean explodesOnComponentBreak(ItemStack aStack);
@@ -416,7 +426,7 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
                 if (mInventory[1].getItem() instanceof GT_MetaGenerated_Tool_01) {
                     NBTTagCompound tNBT = mInventory[1].getTagCompound();
                     if (tNBT != null) {
-                        NBTTagCompound tNBT2 = tNBT.getCompoundTag("GT.CraftingComponents");
+                        NBTTagCompound tNBT2 = tNBT.getCompoundTag("GT.CraftingComponents");//tNBT2 dont use out if
                         if (!tNBT.getBoolean("mDis")) {
                             tNBT2 = new NBTTagCompound();
                             Materials tMaterial = GT_MetaGenerated_Tool.getPrimaryMaterial(mInventory[1]);
@@ -496,7 +506,7 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
         if (aEU <= 0) return true;
         for (GT_MetaTileEntity_Hatch_Dynamo tHatch : mDynamoHatches) {
             if (isValidMetaTileEntity(tHatch)) {
-                if (tHatch.getBaseMetaTileEntity().increaseStoredEnergyUnits(aEU, true)) {
+                if (tHatch.getBaseMetaTileEntity().increaseStoredEnergyUnits(aEU, false)) {
                     return true;
                 }
             }
@@ -793,7 +803,7 @@ public abstract class GT_MetaTileEntity_MultiBlockBase extends MetaTileEntity {
 
     @Override
     public String[] getInfoData() {
-        return new String[]{"Progress:", (mProgresstime / 20) + "secs", (mMaxProgresstime / 20) + "secs", "Efficiency:", (mEfficiency / 100.0F) + "%", "Problems:", "" + (getIdealStatus() - getRepairStatus())};
+        return new String[]{"Progress:", (mProgresstime / 20) + "secs", (mMaxProgresstime / 20) + "secs", "Efficiency:", (mEfficiency / 100.0F) + "%", "Problems:", String.valueOf((getIdealStatus() - getRepairStatus()))};
     }
 
     @Override

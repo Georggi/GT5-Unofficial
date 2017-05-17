@@ -1,6 +1,7 @@
 package gregtech.api.util;
 
 import cpw.mods.fml.common.Loader;
+import gregtech.GT_Mod;
 import gregtech.api.GregTech_API;
 import gregtech.api.enums.ConfigCategories;
 import gregtech.api.enums.Materials;
@@ -135,7 +136,7 @@ public class GT_BaseCrop extends CropCard implements ICropCardInfo {
 
     @Override
     public final boolean canGrow(ICropTile aCrop) {
-        if (mBlock != null && aCrop.getSize() == mMaxSize - 1) {
+        if (GT_Mod.gregtechproxy.mCropNeedBlock && mBlock != null && aCrop.getSize() == mMaxSize - 1) {
             return isBlockBelow(aCrop);
         }
         return aCrop.getSize() < maxSize();
@@ -175,7 +176,7 @@ public class GT_BaseCrop extends CropCard implements ICropCardInfo {
     @Override
     public ItemStack getGain(ICropTile aCrop) {
         int tDrop = 0;
-        if (mSpecialDrops != null && (tDrop = new Random().nextInt((mSpecialDrops.length*2) + 2)) < mSpecialDrops.length && mSpecialDrops[tDrop] != null) {
+        if (mSpecialDrops != null && (tDrop = java.util.concurrent.ThreadLocalRandom.current().nextInt(0, (mSpecialDrops.length*2) + 2)) < mSpecialDrops.length && mSpecialDrops[tDrop] != null) {
             return GT_Utility.copy(mSpecialDrops[tDrop]);
         }
         return GT_Utility.copy(mDrop);

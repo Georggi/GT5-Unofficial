@@ -5,7 +5,7 @@ import gregtech.api.enums.Dyes;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.TextureSet;
 
-public class ProcessingConfig implements gregtech.api.interfaces.IMaterialRegistrator {
+public class ProcessingConfig implements gregtech.api.interfaces.IMaterialHandler {
     public ProcessingConfig() {
         Materials.add(this);
     }
@@ -20,7 +20,27 @@ public class ProcessingConfig implements gregtech.api.interfaces.IMaterialRegist
     }
 
     @Override
-    public void onComponentRegistration(Materials aMaterial) {
-        //NOOP
+    public void onComponentInit() {
+        /** This is just left here as an example of how to add components. **/
+        /* Enabling specific components:
+        OrePrefixes.spring.enableComponent(Materials.Cobalt);
+        OrePrefixes.ingotDouble.enableComponent(Materials.Cobalt);
+        OrePrefixes.ingotTriple.enableComponent(Materials.Cobalt);
+        OrePrefixes.ingotQuadruple.enableComponent(Materials.Cobalt);
+        OrePrefixes.ingotQuintuple.enableComponent(Materials.Cobalt);
+        OrePrefixes.plateDouble.enableComponent(Materials.Cobalt);
+        OrePrefixes.plateTriple.enableComponent(Materials.Cobalt);
+        OrePrefixes.plateQuadruple.enableComponent(Materials.Cobalt);
+        OrePrefixes.plateQuintuple.enableComponent(Materials.Cobalt);
+        OrePrefixes.plateDense.enableComponent(Materials.Cobalt); */
+    }
+
+    @Override
+    public void onComponentIteration(Materials aMaterial) {
+        /** This is just left here as an example of how to add components. **/
+        /*Enabling/Disabling components depending on the current Materials values:
+        if ((aMaterial.mTypes & 0x40) != 0) { //This material can be made into tool heads
+            OrePrefixes.plateQuadruple.mDisabledItems.remove(aMaterial);
+        } */
     }
 }

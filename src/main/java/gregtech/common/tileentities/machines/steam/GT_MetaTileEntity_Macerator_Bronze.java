@@ -29,12 +29,16 @@ public class GT_MetaTileEntity_Macerator_Bronze
         super(aName, aDescription, aTextures, 1, 1, false);
     }
 
+    public GT_MetaTileEntity_Macerator_Bronze(String aName, String[] aDescription, ITexture[][][] aTextures) {
+        super(aName, aDescription, aTextures, 1, 1, false);
+    }
+
     public Object getClientGUI(int aID, InventoryPlayer aPlayerInventory, IGregTechTileEntity aBaseMetaTileEntity) {
-        return new GT_GUIContainer_BasicMachine(aPlayerInventory, aBaseMetaTileEntity, getLocalName(), "BronzeMacerator.png", "ic2.macerator");
+        return new GT_GUIContainer_BasicMachine(aPlayerInventory, aBaseMetaTileEntity, getLocalName(), "BronzeMacerator.png", GT_Recipe_Map.sMaceratorRecipes.mUnlocalizedName);
     }
 
     public MetaTileEntity newMetaEntity(IGregTechTileEntity aTileEntity) {
-        return new GT_MetaTileEntity_Macerator_Bronze(this.mName, this.mDescription, this.mTextures);
+        return new GT_MetaTileEntity_Macerator_Bronze(this.mName, this.mDescriptionArray, this.mTextures);
     }
 
     public void onPreTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick) {
@@ -66,7 +70,7 @@ public class GT_MetaTileEntity_Macerator_Bronze
         if (!super.allowPutStack(aBaseMetaTileEntity, aIndex, aSide, aStack)) {
             return false;
         }
-        return GT_ModHandler.getMaceratorOutput(GT_Utility.copyAmount(64L, new Object[]{aStack}), false, null) != null;
+        return GT_Recipe.GT_Recipe_Map.sMaceratorRecipes.containsInput(GT_Utility.copyAmount(64L, new Object[]{aStack}));
     }
 
     public void startSoundLoop(byte aIndex, double aX, double aY, double aZ) {

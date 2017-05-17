@@ -94,6 +94,8 @@ public abstract class GT_MetaTileEntity_LargeTurbine extends GT_MetaTileEntity_M
                 } else {
                     return false;
                 }
+            } else {
+                return false;
             }
         } else {
             return false;
@@ -124,6 +126,7 @@ public abstract class GT_MetaTileEntity_LargeTurbine extends GT_MetaTileEntity_M
 
     @Override
     public boolean checkRecipe(ItemStack aStack) {
+    	if(aStack==null || !(aStack.getItem() instanceof GT_MetaGenerated_Tool)  || aStack.getItemDamage() < 170 || aStack.getItemDamage() >179)return false;
         ArrayList<FluidStack> tFluids = getStoredFluids();
         if (tFluids.size() > 0) {
             if (baseEff == 0 || optFlow == 0 || counter >= 1000 || this.getBaseMetaTileEntity().hasWorkJustBeenEnabled()
@@ -163,7 +166,7 @@ public abstract class GT_MetaTileEntity_LargeTurbine extends GT_MetaTileEntity_M
             this.mMaxProgresstime = 1;
             this.mEfficiencyIncrease = (10);
             if(this.mDynamoHatches.size()>0){
-            	if(this.mDynamoHatches.get(0).getBaseMetaTileEntity().getOutputVoltage() < (mEUt * mEfficiency) / 10000){
+            	if(this.mDynamoHatches.get(0).getBaseMetaTileEntity().getOutputVoltage() < (int)((long)mEUt * (long)mEfficiency / 10000L)){
             	explodeMultiblock();}
             }
             return true;
@@ -186,12 +189,6 @@ public abstract class GT_MetaTileEntity_LargeTurbine extends GT_MetaTileEntity_M
         }
         return 0;
     }
-
-    @Override
-    public int getAmountOfOutputs() {
-        return 0;
-    }
-
     @Override
     public boolean explodesOnComponentBreak(ItemStack aStack) {
         return true;

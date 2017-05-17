@@ -13,7 +13,7 @@ import net.minecraft.init.Blocks;
 
 public class GT_Block_Ores extends GT_Block_Ores_Abstract {
     public GT_Block_Ores() {
-        super("gt.blockores", 7, Material.rock);
+        super("gt.blockores", 7, false, Material.rock);
     }
 
     @Override
@@ -24,6 +24,20 @@ public class GT_Block_Ores extends GT_Block_Ores_Abstract {
     @Override
     public OrePrefixes[] getProcessingPrefix() { //Must have 8 entries; an entry can be null to disable automatic recipes.
         return new OrePrefixes[]{OrePrefixes.ore, OrePrefixes.oreNetherrack, OrePrefixes.oreEndstone, OrePrefixes.oreBlackgranite, OrePrefixes.oreRedgranite, OrePrefixes.oreMarble, OrePrefixes.oreBasalt, null};
+    }
+
+    @Override
+    public int getBaseBlockHarvestLevel(int aMeta) {
+        switch (aMeta) {
+            case 3:
+            case 4:return 3;
+            case 0:
+            case 1:
+            case 2:
+            case 5:
+            case 6:
+            default:return 0;
+        }
     }
 
     @Override

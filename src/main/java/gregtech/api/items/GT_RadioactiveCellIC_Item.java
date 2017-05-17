@@ -1,7 +1,6 @@
 package gregtech.api.items;
 
 
-import gregtech.api.enums.ItemList;
 import ic2.api.reactor.IReactor;
 import ic2.api.reactor.IReactorComponent;
 import ic2.core.IC2Potion;
@@ -12,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+
+import gregtech.api.GregTech_API;
 
 
 public class GT_RadioactiveCellIC_Item extends GT_RadioactiveCell_Item implements IReactorComponent {
@@ -54,7 +55,7 @@ public class GT_RadioactiveCellIC_Item extends GT_RadioactiveCell_Item implement
                 for (int i = 0; i < pulses; i++) {
                     acceptUraniumPulse(reactor, yourStack, yourStack, x, y, x, y, heatrun);
                 }
-                pulses += checkPulseable(reactor, x - 1, y, yourStack, x, y, heatrun) + checkPulseable(reactor, x + 1, y, yourStack, x, y, heatrun) + checkPulseable(reactor, x, y - 1, yourStack, x, y, heatrun) + checkPulseable(reactor, x, y + 1, yourStack, x, y, heatrun);
+                checkPulseable(reactor, x - 1, y, yourStack, x, y, heatrun);checkPulseable(reactor, x + 1, y, yourStack, x, y, heatrun);checkPulseable(reactor, x, y - 1, yourStack, x, y, heatrun);checkPulseable(reactor, x, y + 1, yourStack, x, y, heatrun);
             } else {
                 pulses += checkPulseable(reactor, x - 1, y, yourStack, x, y, heatrun) + checkPulseable(reactor, x + 1, y, yourStack, x, y, heatrun) + checkPulseable(reactor, x, y - 1, yourStack, x, y, heatrun) + checkPulseable(reactor, x, y + 1, yourStack, x, y, heatrun);
 
@@ -145,7 +146,7 @@ public class GT_RadioactiveCellIC_Item extends GT_RadioactiveCell_Item implement
     public void onUpdate(ItemStack stack, World world, Entity entity, int slotIndex, boolean isCurrentItem) {
         if (this.sRadiation > 0 && (entity instanceof EntityLivingBase)) {
             EntityLivingBase entityLiving = (EntityLivingBase) entity;
-            if (!ItemArmorHazmat.hasCompleteHazmat(entityLiving)) {
+            if (!GregTech_API.mIC2Classic&&!ItemArmorHazmat.hasCompleteHazmat(entityLiving)) {
                 IC2Potion.radiation.applyTo(entityLiving, sRadiation * 20, sRadiation * 10);
             }
         }
