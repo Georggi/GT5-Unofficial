@@ -7,7 +7,12 @@ This is project modification GT5-Unofficial. Created to make changes to the mod 
 
 ## TODO
 
-### Antimatter Reactor
+### Antimatter Update
+
+- Charging casing
+- Add machine for generation Antimatter/Neutronium
+- Charging Antimatter Pod
+- Config for Reactor
 
 ### Tweak
 
